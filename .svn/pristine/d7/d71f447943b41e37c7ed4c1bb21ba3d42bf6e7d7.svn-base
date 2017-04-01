@@ -1,0 +1,32 @@
+package com.themopi.exceptions
+
+import org.codehaus.groovy.grails.web.json.JSONObject;
+
+public  class BaseException extends Exception {
+	private int status ;
+	private String message;
+	private String extendedMessage;
+	private String moreInfo;
+	private int errorCode;
+	boolean error = true;
+	
+	public BaseException(int status,int errorCode,String message, String extendedMessage ,String moreInfo){
+		super(message);
+		this.errorCode =  errorCode;
+		this.status = status;
+		this.message = message;
+		this.extendedMessage = extendedMessage;
+		this.moreInfo = moreInfo;
+	}
+	
+	public JSONObject errorResponse(){
+		JSONObject errorJson = new JSONObject();
+		errorJson.put("status",this.status);
+		errorJson.put("errorCode",this.errorCode);
+		errorJson.put("message",this.message);
+		errorJson.put("extendedMessage",this.extendedMessage);
+		errorJson.put("moreInfo",this.moreInfo);
+		errorJson.put("error",error);
+		return errorJson;
+	   }
+}

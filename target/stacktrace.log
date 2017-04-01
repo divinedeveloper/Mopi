@@ -1,0 +1,200 @@
+2014-12-08 12:06:10,058 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:06:10,060 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:06:10,061 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:06:10,062 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:06:10,070 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:06:10,070 [main] ERROR StackTrace  - Full Stack Trace:
+java.lang.NullPointerException: Cannot get property 'class' on null object
+	at com.mopi.imageupload.ProfileimageuploadController.uploadImage(ProfileimageuploadController.groovy:42)
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:74)
+2014-12-08 12:16:41,622 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:16:41,624 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:16:41,625 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:16:41,625 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:16:41,633 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:16:41,633 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,761 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,764 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,766 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,766 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,779 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:24:43,779 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,504 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,506 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,508 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,508 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,516 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-08 12:32:00,516 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:46,851 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:47,108 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:47,111 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:47,111 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:47,144 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:00:47,145 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,005 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,008 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,010 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,010 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,022 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 11:07:09,023 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:64)
+2014-12-09 12:16:12,555 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-09 12:16:12,557 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-09 12:16:12,559 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-09 12:16:12,559 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-09 12:16:12,568 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-09 12:16:12,568 [main] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.ReadOnlyPropertyException: Cannot set readonly property: params for class: com.mopi.imageupload.ProfileimageuploadController
+	at com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec.test succesful profile image upload(ProfileimageuploadControllerIntegrationSpec.groovy:63)
+2014-12-17 16:02:06,324 [localhost-startStop-1] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.MissingPropertyException: No such property: CustomAuthenticationEntryPoint for class: resources
+	at org.codehaus.groovy.runtime.ScriptBytecodeAdapter.unwrap(ScriptBytecodeAdapter.java:50)
+	at org.codehaus.groovy.runtime.callsite.PogoGetPropertySite.getProperty(PogoGetPropertySite.java:49)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.callGroovyObjectGetProperty(AbstractCallSite.java:231)
+	at resources$_run_closure1.doCall(resources.groovy:8)
+	at resources$_run_closure1.doCall(resources.groovy)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.springsource.loaded.ri.ReflectiveInterceptor.jlrMethodInvoke(ReflectiveInterceptor.java:1270)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:90)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:233)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1085)
+	at groovy.lang.ExpandoMetaClass.invokeMethod(ExpandoMetaClass.java:1110)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:909)
+	at groovy.lang.Closure.call(Closure.java:423)
+	at resources$_run_closure1.call(resources.groovy)
+	at groovy.lang.Closure.call(Closure.java:417)
+	at resources$_run_closure1.call(resources.groovy)
+	at grails.spring.BeanBuilder.invokeBeanDefiningClosure(BeanBuilder.java:754)
+	at grails.spring.BeanBuilder.beans(BeanBuilder.java:584)
+	at org.codehaus.groovy.grails.commons.spring.RuntimeSpringConfigUtilities.reloadSpringResourcesConfig(RuntimeSpringConfigUtilities.java:99)
+	at org.codehaus.groovy.grails.commons.spring.RuntimeSpringConfigUtilities.loadExternalSpringConfig(RuntimeSpringConfigUtilities.java:77)
+	at org.codehaus.groovy.grails.commons.spring.GrailsRuntimeConfigurator.loadSpringGroovyResources(GrailsRuntimeConfigurator.java:332)
+	at org.codehaus.groovy.grails.commons.spring.GrailsRuntimeConfigurator.doPostResourceConfiguration(GrailsRuntimeConfigurator.java:314)
+	at org.codehaus.groovy.grails.commons.spring.GrailsRuntimeConfigurator.configure(GrailsRuntimeConfigurator.java:159)
+	at org.codehaus.groovy.grails.commons.spring.GrailsRuntimeConfigurator.configure(GrailsRuntimeConfigurator.java:127)
+	at org.codehaus.groovy.grails.web.context.GrailsConfigUtils.configureWebApplicationContext(GrailsConfigUtils.java:126)
+	at org.codehaus.groovy.grails.web.context.GrailsContextLoaderListener.initWebApplicationContext(GrailsContextLoaderListener.java:109)
+	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:106)
+	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4973)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5467)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1559)
+	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1549)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:745)
+2014-12-17 16:02:06,374 [localhost-startStop-1] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.MissingPropertyException: No such property: CustomAuthenticationEntryPoint for class: resources
+	at resources$_run_closure1.doCall(resources.groovy:8)
+	at grails.spring.BeanBuilder.invokeBeanDefiningClosure(BeanBuilder.java:754)
+	at grails.spring.BeanBuilder.beans(BeanBuilder.java:584)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:745)
+2014-12-17 16:02:06,375 [localhost-startStop-1] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.MissingPropertyException: No such property: CustomAuthenticationEntryPoint for class: resources
+	at resources$_run_closure1.doCall(resources.groovy:8)
+	at grails.spring.BeanBuilder.invokeBeanDefiningClosure(BeanBuilder.java:754)
+	at grails.spring.BeanBuilder.beans(BeanBuilder.java:584)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:745)
+2014-12-17 16:02:06,376 [localhost-startStop-1] ERROR StackTrace  - Full Stack Trace:
+groovy.lang.MissingPropertyException: No such property: CustomAuthenticationEntryPoint for class: resources
+	at resources$_run_closure1.doCall(resources.groovy:8)
+	at grails.spring.BeanBuilder.invokeBeanDefiningClosure(BeanBuilder.java:754)
+	at grails.spring.BeanBuilder.beans(BeanBuilder.java:584)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:745)

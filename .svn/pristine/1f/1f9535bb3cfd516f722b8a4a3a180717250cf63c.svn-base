@@ -1,0 +1,710 @@
+// locations to search for config files that get merged into the main config;
+// config files can be ConfigSlurper scripts, Java properties files, or classes
+// in the classpath in ConfigSlurper format
+
+// grails.config.locations = [ "classpath:${appName}-config.properties",
+//                             "classpath:${appName}-config.groovy",
+//                             "file:${userHome}/.grails/${appName}-config.properties",
+//                             "file:${userHome}/.grails/${appName}-config.groovy"]
+
+// if (System.properties["${appName}.config.location"]) {
+//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+// }
+
+grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
+
+// The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
+grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
+grails.mime.types = [ // the first one is the default format
+    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
+    atom:          'application/atom+xml',
+    css:           'text/css',
+    csv:           'text/csv',
+    form:          'application/x-www-form-urlencoded',
+    html:          ['text/html','application/xhtml+xml'],
+    js:            'text/javascript',
+    json:          ['application/json', 'text/json'],
+    multipartForm: 'multipart/form-data',
+    rss:           'application/rss+xml',
+    text:          'text/plain',
+    hal:           ['application/hal+json','application/hal+xml'],
+    xml:           ['text/xml', 'application/xml']
+]
+
+// URL Mapping Cache Max Size, defaults to 5000
+//grails.urlmapping.cache.maxsize = 1000
+
+// Legacy setting for codec used to encode data with ${}
+grails.views.default.codec = "html"
+grails.resources.rewrite.css = false
+grails.resources.adhoc.includes = [
+	'/images/**', '/css/**', '/js/**', '/partials/**', '/img/**', '/json/**', '/fonts/**'
+]
+// The default scope for controllers. May be prototype, session or singleton.
+// If unspecified, controllers are prototype scoped.
+grails.controllers.defaultScope = 'singleton'
+
+// GSP settings
+grails {
+    views {
+        gsp {
+            encoding = 'UTF-8'
+            htmlcodec = 'xml' // use xml escaping instead of HTML4 escaping
+            codecs {
+                expression = 'html' // escapes values inside ${}
+                scriptlet = 'html' // escapes output from scriptlets in GSPs
+                taglib = 'none' // escapes output from taglibs
+                staticparts = 'none' // escapes output from static template parts
+            }
+        }
+        // escapes all not-encoded output at final stage of outputting
+        // filteringCodecForContentType.'text/html' = 'html'
+    }
+
+	//for sending mail
+	mail {
+		host = "smtp.webfaction.com"
+		port = 587
+		username = "rkgtech_dnr"
+		password = "pa\$\$word"
+		props = ["mail.debug":"true",
+				 "mail.smtp.auth":"true"]
+	  }
+}
+
+
+grails.converters.encoding = "UTF-8"
+// scaffolding templates configuration
+grails.scaffolding.templates.domainSuffix = 'Instance'
+
+// Set to false to use the new Grails 1.2 JSONBuilder in the render method
+grails.json.legacy.builder = false
+// enabled native2ascii conversion of i18n properties files
+grails.enable.native2ascii = true
+// packages to include in Spring bean scanning
+grails.spring.bean.packages = []
+// whether to disable processing of multi part requests
+grails.web.disable.multipart=false
+grails.resources.mappers.bundle.enabled = false
+// request parameters to mask when logging exceptions
+grails.exceptionresolver.params.exclude = ['password']
+
+// configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
+grails.hibernate.cache.queries = false
+
+// configure passing transaction's read-only attribute to Hibernate session, queries and criterias
+// set "singleSession = false" OSIV mode in hibernate configuration after enabling
+grails.hibernate.pass.readonly = false
+// configure passing read-only to OSIV session by default, requires "singleSession = false" OSIV mode
+grails.hibernate.osiv.readonly = false
+
+environments {
+    development {
+        grails.logging.jul.usebridge = true
+		myapp.baseUrl = "http://localhost:8080/mopi"
+		myapp.tempImageFolderPath="C:\\Users\\lenovo\\Desktop\\temp\\"
+    }
+    production {
+        grails.logging.jul.usebridge = false
+		myapp.baseUrl = "https://162.244.25.29"
+		myapp.tempImageFolderPath="/home/devuser/images/"
+        // TODO: grails.serverURL = "http://www.changeme.com"
+    }
+}
+
+log4j = {
+	debug "grails.app.controllers"
+	debug "grails.app.domain"
+	debug 'com.odobo'
+	debug 'grails.app.contorllers.*'
+	debug 'grails.app.services.*'
+	debug 'grails.app.domain.*'
+	debug 'grails.app.controllers.com.odobo'
+	debug 'grails.app.services.com.odobo'
+	debug 'org.pac4j'
+	debug 'org.springframework.security'
+}
+// log4j configuration
+log4j.main = {
+    // Example of changing the log pattern for the default console appender:
+    //
+    //appenders {
+    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+    //}
+	debug "grails.app.controllers"
+	debug "grails.app.domain"
+	debug "grails.app.services"
+	debug "grails.app.domain"
+	debug 'grails.app.contorllers.*'
+	debug 'grails.app.services.*'
+	debug 'grails.app.domain.*'
+	debug 'com.odobo'
+	debug 'grails.app.controllers.com.odobo'
+	debug 'grails.app.services.com.odobo'
+	debug 'grails.app.services.com.themopi.account.*'
+	debug 'org.pac4j'
+	debug 'org.springframework.security'
+    error  'org.codehaus.groovy.grails.web.servlet',        // controllers
+           'org.codehaus.groovy.grails.web.pages',          // GSP
+           'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+           'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+           'org.codehaus.groovy.grails.commons',            // core / classloading
+           'org.codehaus.groovy.grails.plugins',            // plugins
+           'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+           'org.springframework',
+           'org.hibernate',
+           'net.sf.ehcache.hibernate',
+		   'grails.app.contorllers.*',
+		   'grails.app.services.*',
+		   'grails.app.domain.*'
+}
+//email configurations
+
+myapp.forgotPassword = "/#/resetpassword/"
+myapp.confirmation = "/api/v1/register/confirmation?giftVerificationToken="
+myapp.verifyRegistration="/api/v1/register/account/verification/"
+myapp.email.from="dnr@rkgtechllc.com"
+myapp.registrationSubject = "Welcome to Mopi"
+myapp.registrationEmail = '''Hi, </br> Welcome to Mopi! </br>Please <a href='$link'>click Here</a> to confirm your registration'''
+myapp.newEmail = '''Hi, </br> Your email is changed from $oldEmail to $newEmail'''
+myapp.newEmailSubject = "Mopi email is changed."
+// aws -sdk configuration
+grails.plugin.awssdk.accessKey = "AKIAJYUWW7CECGMR2JDQ"
+grails.plugin.awssdk.secretKey = "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"
+bucketName ="mopi-tmp-media"
+
+myapp.commentReportCountThreshold = 10
+
+//Spring Security REST properties
+grails.plugin.springsecurity.rest.login.active = true
+grails.plugin.springsecurity.rest.login.endpointUrl = "/api/login"
+grails.plugin.springsecurity.rest.login.failureStatusCode =  401
+grails.plugin.springsecurity.rest.token.rendering.usernamePropertyName ="email"
+grails.plugin.springsecurity.rest.token.rendering.authoritiesPropertyName = "roles"
+grails.plugin.springsecurity.rest.token.validation.enableAnonymousAccess = true
+grails.plugin.springsecurity.rest.login.useJsonCredentials	= true
+grails.plugin.springsecurity.rest.login.usernamePropertyName = "email"
+grails.plugin.springsecurity.rest.login.passwordPropertyName = "password"
+grails.plugin.springsecurity.rest.logout.endpointUrl= '/api/logout'
+grails.plugin.springsecurity.rest.token.generation.useSecureRandom = true
+grails.plugin.springsecurity.rest.token.storage.useGorm = true
+grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'com.themopi.account.AuthenticationToken'
+grails.plugin.springsecurity.rest.token.storage.gorm.tokenValuePropertyName = "authToken"
+grails.plugin.springsecurity.rest.token.storage.gorm.usernamePropertyName = 'email'
+grails.plugin.springsecurity.rest.login.useRequestParamsCredentials	= false
+grails.plugin.springsecurity.filterChain.chainMap = [
+	'/api/v1/logout': 'anonymousAuthenticationFilter',
+	'/api/v1/login': 'anonymousAuthenticationFilter',
+	'/api/v1/test': 'anonymousAuthenticationFilter', // Stateless chain
+	'/api/v1/register/**':'anonymousAuthenticationFilter',  // Stateless chain
+	'/api/v1/surveys/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',
+	'/api/v1/tags/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter',
+	'/api/v1/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter', // Stateless chain
+	//'/**': 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor'
+	'/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'                                          // Traditional chain
+]
+grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
+grails.plugin.springsecurity.rest.token.validation.headerName = 'X-Auth-Token'
+
+//cors configurations
+
+cors.url.pattern = '/api/*'
+cors.headers = ['Access-Control-Allow-Origin': '*']
+cors.enabled = true
+
+// Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.dao.reflectionSaltSourceProperty = 'salt'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.themopi.account.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.themopi.account.UserRole'
+grails.plugin.springsecurity.authority.className = 'com.themopi.account.Role'
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+	'/':                              ['permitAll'],
+	'/index':                         ['permitAll'],
+	'/index.gsp':                     ['permitAll'],
+	'/assets/**':                     ['permitAll'],
+	'/**/js/**':                      ['permitAll'],
+	'/**/css/**':                     ['permitAll'],
+	'/**/images/**':                  ['permitAll'],
+	'/**/favicon.ico':                ['permitAll']
+]
+
+
+grails.plugin.springsecurity.interceptUrlMap = [
+	'/':                  ['permitAll'],
+	'/index':             ['permitAll'],
+	'/index.gsp':         ['permitAll'],
+	'/assets/**':         ['permitAll'],
+	'/**/js/**':          ['permitAll'],
+	'/**/css/**':         ['permitAll'],
+	'/**/images/**':      ['permitAll'],
+	'/**/favicon.ico':    ['permitAll'],
+	'/login/**':          ['permitAll'],
+	'/logout/**':         ['permitAll'],
+	'/dashboard/**':	  ['permitAll']
+
+]
+
+//Exceptions Messages
+customExceptions{
+			security{
+				fourZeroFour{
+					logout{
+						errorCode=4404
+						status = 404
+						message="Authorization token not found."
+						extendedMessage="Trying to find authorization token failed. No entry available"
+						moreInfo="User may not have loggedin"
+					}
+				}
+			}
+			password{
+				fourZeroZero{
+					password{
+						errorCode=10400
+						status = 400
+						message="Bad request. password can not be same."
+						extendedMessage="Last password can't be the same with new password."
+						moreInfo="Please submit new password."
+					}
+				}
+			}
+			image{
+				fourZeroZero{
+					image{
+						errorCode=10400
+						status = 400
+						message="Bad request. Image not found in request."
+						extendedMessage="User didn't submit the Image."
+						moreInfo="Image not found."
+					}
+				}
+			}
+			account{
+				fourZeroFour{
+					forgotpassword{
+						errorCode=3404
+						status = 404
+						message="User not found."
+						extendedMessage="Trying to find user failed. No entry available"
+						moreInfo="User not available in database"
+					}
+					role{
+						errorCode = 3404
+						status = 404
+						message = "Role not found."
+						extendedMessage= "Tyring to assign a role that doesn't exist."
+						moreInfo = "Role doesn't exist in the application."
+					}
+					user{
+						errorCode = 3404
+						status = 404
+						message = "Account not found."
+						extendedMessage= "Operation failed to find user using email mentioned."
+						moreInfo = "Account with the mention email  in the request may not exist."
+					}
+					registration{
+						errorCode = 3404
+						status = 404
+						message = "Account not found."
+						extendedMessage= "Operation failed to find user using token mentioned."
+						moreInfo = "Account with the mention token  in the request may not exist."
+					}
+					verificationToken{
+						errorCode=3404
+						status = 404
+						message="Verification Token not saved"
+						extendedMessage="Error while saving verification token for user"
+						moreInfo="Error while saving verification token for user"
+					}
+					survey{
+						errorCode = 5404
+						status = 404
+						message = "Survey not found."
+						extendedMessage= "Operation failed to find Survey ."
+						moreInfo = "Survey with the mention id  in the request may not exist."
+					}
+					giftVerificationToken{
+						errorCode=3404
+						status = 404
+						message="Gift Verification Token not found"
+						extendedMessage="Error while getting gift verification token for user"
+						moreInfo="Error while getting gift verification token for user"
+					}
+				}
+				fourZeroOne{
+					notAuthorized{
+						errorCode = 3401
+						status = 401
+						message = "Not authorized to perform this action."
+						extendedMessage= "Trying to perform the functionality which is not allowed to this user role"
+						moreInfo = "role specific error"
+					}
+				}
+				fourZeroZero{
+					userRole{
+						errorCode = 3400
+						status = 400
+						message = "Assigning role to user failed."
+						extendedMessage= "Tyring to assign a role to user fail. user or role may not exist"
+						moreInfo = "User or role may not exist"
+					}
+					user{
+						errorCode = 3400
+						status = 400
+						message = "Validation error. Creating a use failed"
+						extendedMessage= "There is a validation error in creating the error.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the error.Fields failed the validations."
+
+					}
+
+					hashTag{
+						errorCode = 6400
+						status = 400
+						message = "Validation error. Failed to create tag"
+						extendedMessage= "There is a validation error in creating the tag.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the tag.Fields failed the validations."
+
+					}
+					address{
+						errorCode = 3400
+						status = 400
+						message = "Validation error.Operation to create/update address failed"
+						extendedMessage= "There is a validation error in creating/updating the address.Fields failed the validations."
+						moreInfo = "There is a validation error in creating/updating the address.Fields failed the validations."
+
+					}
+					profile{
+						errorCode = 3400
+						status = 400
+						message = "Validation error.Operation to create/update profile failed"
+						extendedMessage= "There is a validation error in creating/updating the profile.Fields failed the validations."
+						moreInfo = "There is a validation error in creating/updating the profile.Fields failed the validations."
+
+					}
+					forgotpassword{
+						errorCode=3400
+						status = 400
+						message="Validation error in password"
+						extendedMessage="Password cannot be blank or null"
+						moreInfo="Reseting password failed with validation error"
+					}
+					userPassword{
+						errorCode=3400
+						status = 400
+						message="Validation error. Operation to update user password failed"
+						extendedMessage="Error while saving new password for user"
+						moreInfo="Error while saving new password for user"
+					}
+					giftVerificationToken{
+						errorCode=3400
+						status = 400
+						message="Gift Verification Token not saved"
+						extendedMessage="Error while saving gift verification token for user"
+						moreInfo="Error while saving gift verification token for user"
+					}
+					userGiftConfirmation{
+						errorCode=3400
+						status = 400
+						message="Error while making user eligible for gifts."
+						extendedMessage="Error while saving user for gifts"
+						moreInfo="Error while saving user for gifts"
+					}
+				}
+				fourZeroNine{
+					userCreate{
+						errorCode = 3409
+						status = 409
+						message = "Email already exist.Please try another email."
+						extendedMessage= "Account email is already exist. Email unique constraint."
+						moreInfo = "Unique email constraint error."
+					}
+					username{
+						errorCode = 3409
+						status = 409
+						message = "Username already exist.Please try another username."
+						extendedMessage= "Username email is already exist. Username unique constraint."
+						moreInfo = "Unique username constraint error."
+				    }
+
+				}
+			}
+			connection{
+				fourZeroNine{
+					connection{
+						errorCode = 9403
+						status = 403
+						message = "you have already requested the user."
+						extendedMessage= "A following request is already exist."
+						moreInfo = "A following request is already exist."
+
+					}
+				}
+				fourZeroZero{
+					connection{
+						errorCode = 9400
+						status = 400
+						message = "Following request not found"
+						extendedMessage= "Following request not found."
+						moreInfo = "Following request not found."
+
+					}
+				}
+			}
+			survey{
+				fourZeroFour{
+					address{
+						errorCode = 3400
+						status = 400
+						message = "Validation error.Operation to create/update location failed"
+						extendedMessage= "There is a validation error in creating/updating the location.Fields failed the validations."
+						moreInfo = "There is a validation error in creating/updating the location.Fields failed the validations."
+
+					}
+					like{
+						errorCode = 3400
+						status = 400
+						message = "Validation error.Operation to like/unlike survey failed"
+						extendedMessage= "There is a validation error in like/unlike survey .Fields failed the validations."
+						moreInfo = "There is a validation error in like/unlike survey.Fields failed the validations."
+
+					}
+					uploadimage{
+						errorCode = 3400
+						status = 400
+						message = "uploadimage is failed"
+						extendedMessage= "There is a validation error in uploadimage is failed"
+						moreInfo = "There is a validation error in uploadimage is failed"
+					}
+					survey{
+						errorCode = 5404
+						status = 404
+						message = "Survey not found."
+						extendedMessage= "Operation failed to find Survey ."
+						moreInfo = "Survey with the mention id  in the request may not exist."
+					}
+					surveyQuestion {
+						errorCode = 5404
+						status = 404
+						message = "Question doesn't exist."
+						extendedMessage= "Operation failed.Question with specifiedId doesn't exist."
+						moreInfo = "Operation failed.Question doesn't exist. Response is null."
+					}
+				}
+				fourZeroZero{
+					survey{
+						errorCode = 5400
+						status = 400
+						message = "Validation error. Failed to create survey"
+						extendedMessage= "There is a validation error in creating the survey.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the survey.Fields failed the validations."
+
+					}
+					surveyActiveStatus {
+						errorCode = 5400
+						status = 400
+						message = "Validation error. Couldn't update status to active. Survey must have atleast one question."
+						extendedMessage= "There is a validation error in creating the survey.User can activate the status to active , if survey have atleast one question."
+						moreInfo = "There is a validation error in creating the survey.Fields failed the validations."
+					}
+					surveyQuestionCount {
+						errorCode = 5400
+						status = 400
+						message = "Couldn't add more questions. Survey must have maximum 15 questions."
+						extendedMessage= "Operation failed. Question limit to 15 reached for the server."
+						moreInfo = "Operation failed. Question limit to 15 reached for the server."
+					}
+					multipleChoice{
+						errorCode = 5400
+						status = 400
+						message = "Couldn't add more questions. Question must have altleast 2 options."
+						extendedMessage= "Operation failed.Question must have altleast 2 options."
+						moreInfo = "Operation failed. Question must have altleast 2 options."
+
+					}
+
+					multipleChoiceOption{
+						errorCode = 5400
+						status = 400
+						message = "Couldn't add more questions. Question can have min 2 and max 6 options."
+						extendedMessage= "Operation failed.Question can have min 2 and max 6 options."
+						moreInfo = "Operation failed. Question can have min 2 and max 6 options."
+
+					}
+
+					startDateValidation{
+						errorCode = 5400
+						status = 400
+						message = "survey start date cannot be in the past"
+						extendedMessage= "Validation error. Survey cannot start in the past"
+						moreInfo = "Validation error. Survey cannot start in the past"
+
+					}
+
+					startEndDateValidation{
+						errorCode = 5400
+						status = 400
+						message = "Start date cannot be null if end date is specified"
+						extendedMessage= "Validation error. Start date cannot be null if end date is specified"
+						moreInfo = "Validation error. Start date cannot be null if end date is specified"
+
+					}
+					surveyReports{
+						errorCode = 5400
+						status = 400
+						message = "SurveyReports are not present in this survey"
+						extendedMessage= "SurveyReport should not be Null For Survey"
+						moreInfo = "SurveyReport should not be Null For Survey"
+
+					}
+					startDateGreaterThanEndDate{
+						errorCode = 5400
+						status = 400
+						message = "Start date must be greater than end date"
+						extendedMessage= "Validation error. Start date must be greater than end date"
+						moreInfo = "Validation error. Start date must be greater than end date"
+
+					}
+				}
+				fourZeroThree{
+					survey{
+						errorCode = 5403
+						status = 403
+						message = "Survey can be updated only in draft mode"
+						extendedMessage= "Update operation failed. Survey can be updated only in draft mode"
+						moreInfo = "Update operation failed. Survey can be updated only in draft mode"
+
+					}
+					updateSurvey{
+						errorCode = 5403
+						status = 403
+						message = "Only owner can update a survey"
+						extendedMessage= "Update operation failed. Survey can be updated only by its owner"
+						moreInfo = "Update operation failed. Survey can be updated only by its owner"
+
+					}
+					surveyActiveStatus {
+						errorCode = 5403
+						status = 403
+						message = "Could not change status back to draft mode"
+						extendedMessage= "There is a restriction. Could not change status back to draft mode"
+						moreInfo = "There is a restriction. Could not change status back to draft mode"
+					}
+				}
+			}
+			comment{
+				fourZeroFour{
+					comment{
+						errorCode = 7404
+						status = 404
+						message = "Comment not found or it is already hidden"
+						extendedMessage= "Operation failed.Comment with specified Id doesn't exist or already hidden"
+						moreInfo = "Operation failed.Comment with specified Id doesn't exist already hidden"
+
+					}
+				}
+				fourZeroZero{
+					comment{
+						errorCode = 7400
+						status = 400
+						message = "Validation error. Failed to create comment"
+						extendedMessage= "There is a validation error in creating the comment.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the comment.Fields failed the validations."
+
+					}
+					commentReport{
+						errorCode = 7400
+						status = 400
+						message = "Validation error. Failed to create comment report"
+						extendedMessage= "There is a validation error in creating the comment report.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the comment report.Fields failed the validations."
+
+					}
+				}
+				fourZeroThree{
+					comment{
+						errorCode = 7403
+						status = 403
+						message = "Authorization failed. User not allowed to hide a comment"
+						extendedMessage= "User is not authorized to hide a comment"
+						moreInfo = "User is not authorized to hide a comment"
+
+					}
+				}
+
+			}
+			surveyResponse{
+				fourZeroThree{
+					responseExist{
+						errorCode = 8403
+						status = 403
+						message = "You have already responded to this query."
+						extendedMessage= "A response to particular question of this survey already exist."
+						moreInfo = "A response to particular question of this survey already exist."
+
+					}
+				}
+				fourZeroFour{
+					surveyResponse{
+						errorCode = 8400
+						status = 400
+						message = "Response is not saved for this particualr question"
+						extendedMessage= "Bad request. Not able to save the request"
+						moreInfo = "Bad request. Not able to save the request."
+
+					}
+				}
+				fourZeroZero{
+					commentQuestion{
+						errorCode = 8400
+						status = 400
+						message = "Bad Request. Question is not a comment question"
+						extendedMessage= "Bad request. Result is not returned as question type is not text"
+						moreInfo = "Bad request. Result is not returned as question type is not text"
+					}
+					surveyStatus{
+						errorCode = 8400
+						status = 400
+						message = "Bad Request. You are not allowed to respondto this question."
+						extendedMessage= "Bad request. Question is either not Active or Flagged."
+						moreInfo = "Bad request. Question is either not Active or Flagged."
+					
+					}
+				}
+			}
+			dashboard{
+				fourZeroFour{}
+				fourZeroZero{
+					dashboard{
+						errorCode = 7400
+						status = 400
+						message = "No Data Found"
+						extendedMessage= "No Data Found"
+						moreInfo = "Please Entere New Data "
+
+					}
+				}
+			}
+			gift{
+				fourZeroFour{}
+				fourZeroZero{
+					gift{
+						errorCode = 7400
+						status = 400
+						message = "Validation error. Failed to create gift"
+						extendedMessage= "There is a validation error in creating the gift.Fields failed the validations."
+						moreInfo = "There is a validation error in creating the gift.Fields failed the validations."
+
+					}
+				}
+				fourZeroNine{
+					gift{
+						errorCode = 3409
+						status = 409
+						message = "Gift already exist.Please try another gift."
+						extendedMessage= "Gift email is already exist. Gift unique constraint."
+						moreInfo = "Unique gift constraint error."
+					}
+				}
+			}
+		}

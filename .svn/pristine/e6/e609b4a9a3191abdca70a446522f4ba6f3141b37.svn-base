@@ -1,0 +1,58 @@
+package com.themopi.apis
+
+import com.themopi.survey.Gift;
+
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.test.mixin.*
+import spock.lang.Unroll
+
+import com.themopi.utils.GenerateDataUtils
+
+/**
+ * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
+ */
+@TestFor(Gift)
+class GiftSpec extends Specification {
+
+    def setup() {
+		mockForConstraintsTests(Gift, [new Gift(email:"abc@rkgtechllc.com",username:"rkgtechllc")])
+		
+    }
+
+    def cleanup() {
+    }
+
+   @Unroll("user #field is #error using #val")
+	def "test text constraints for gift"() {
+		given:
+		/*def springSecurityService = mockFor(SpringSecurityService,true)
+		springSecurityService.demand.encodePassword(){String pwd -> return null}*/
+		
+		when: "pass dynamic fields and values to gift object"
+		def obj = new Gift("$field": val)
+		//obj.springSecurityService= springSecurityService.createMock()
+		
+		then: "call validate constraints method"
+		validateConstraints(obj, field, error)
+
+		where: "pass field names and values"
+		error		|	field			|	val
+		'nullable'	|	'text'			|	null
+		'valid'		|	'text'			|	new GenerateDataUtils().randomString()
+	}
+	
+	
+	private void validateConstraints(obj, field, error) {
+       def validated = obj.validate()
+       if (error && error != 'valid') {
+           assert !validated
+           assert obj.errors[field]
+           assert error == obj.errors[field]
+		   
+	   } else {
+           assert !obj.errors[field]
+       }
+   }
+}

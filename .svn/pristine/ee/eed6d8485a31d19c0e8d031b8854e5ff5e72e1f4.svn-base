@@ -1,0 +1,161 @@
+package com.themopi.apis.searchactivity
+
+import com.themopi.account.UserRole
+import grails.transaction.Transactional
+import com.themopi.survey.*
+import com.themopi.apis.*
+import com.themopi.exceptions.SurveyException
+import com.themopi.surveyactivity.*
+
+@Transactional
+class SurveySearchService {
+	static transactional = 'mongo'
+	def userService
+	def userSurveyService
+	def grailsApplication
+	/**
+	 * function to get survey search results along with count for that search
+	 * 
+	 * @param tokenValue
+	 * @param name
+	 * @param status
+	 * @param offset
+	 * @param limit
+	 * @return  map with search results and total count for search
+	 */
+	def search(tokenValue,name,status,offset,limit){
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		def user = userRole?.user
+		def survey = Survey.createCriteria()
+		def results = []
+		def surveyCount = 0
+		if(userRole?.role?.authority == "ROLE_SUPERADMIN" || userRole?.role?.authority == "ROLE_ADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){
+				}
+				surveyCount = Survey.count()
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){ eq('status',status) }
+				surveyCount = Survey.countByStatus(status)
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}else if(userRole?.role?.authority == "ROLE_SPONSEREDADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){ eq('user',user) }
+				def countList = survey.list(){ eq('user',user) }
+				surveyCount = countList.size();
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					eq('user',user)
+				}
+
+				def countList = survey.list(){
+					eq('status',status)
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}
+	}
+
+	
+	def appSearch(searchCategory,limit,offset){
+		List surveys = []
+		def count = 0
+		if(searchCategory == "explore"){
+			if(limit.toInteger()+offset.toInteger() <= 500){
+				surveys = Survey.findAllByStatus("Active",[max: limit, sort: "lastUpdated", order: "desc", offset:offset])
+				count = Survey.countByStatus("Active")
+				if(count >= 500){
+					count = 500
+				}
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() < 500){
+				limit = 500 - offset;
+				surveys = Survey.findAllByStatus("Active",[max: limit, sort: "lastUpdated", order: "desc", offset:offset])
+				count = 500
+				
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() >= 500){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+
+			}
+		}
+	}
+	def serviceMethod() {
+	}
+}

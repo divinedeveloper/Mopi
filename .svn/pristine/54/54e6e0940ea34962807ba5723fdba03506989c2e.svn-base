@@ -1,0 +1,36 @@
+
+	<div ng-controller="UsersurveystakenCtrl">
+
+  <accordion close-others="oneAtATime">
+  
+  
+    <accordion-group ng-repeat="group in surveyaccords" is-open="group.open">
+        <accordion-heading >
+        <div class="row">
+        <div class="col-xs-1">
+        <img class="img-rounded img64_64" src="images/g1.jpg" alt="">
+        </div>
+          <div class="col-xs-4">
+        {{group.content.surveyName}}
+        </div>
+         <div class="col-xs-3">
+        {{group.content.commentCount}} Comments
+        </div>
+          <div class="col-xs-3">
+        {{group.content.responses}} Responses
+         <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': group.open, 'glyphicon-chevron-right': !group.open}"></i>
+        </div>
+        </div>
+            
+        </accordion-heading>
+ 
+       <div ng-include="group.pageurl"></div>
+    </accordion-group>
+  </accordion>
+<!-- <pagination class="pagination-sm" direction-links="true" total-items="totalItems" ng-model="currentPage" num-pages="smallnumPages" previous-text="&lsaquo;" next-text="&rsaquo;"></pagination> -->
+
+<div class="pagination" ng-show="surveylistcount>0">
+ <pagination total-items="surveylistcount" ng-change="getSurveys()" ng-model="current" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" items-per-page="limit" num-pages="numPages"></pagination>
+</div>
+
+</div>

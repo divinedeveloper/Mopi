@@ -1,0 +1,93 @@
+{
+    "error": false,
+    "resp":[ {
+        "id": 17,
+        "dateCreated": "2014-09-22T06:52:26Z",
+        "endTime": "2014-09-21T18:30:00Z",
+        "lastUpdated": "2014-09-22T07:17:40Z",
+        "questionCount": 4,
+        "questionList": [
+            {
+                "id": 1,
+                "name": "is this test question ?",
+                "dateCreated": null,
+                "imageUrl": null,
+                "isActive": true,
+                "lastUpdated": null,
+                "option": [
+                    "yes",
+                    "no",
+                    "hello"
+                ],
+                "questionType": "multiplechoice",
+                "responseCount": 0
+            },
+            {
+                "id": 2,
+                "name": "is this test question 2?",
+                "dateCreated": null,
+                "imageUrl": null,
+                "isActive": true,
+                "lastUpdated": null,
+                "option": [
+                    "yes",
+                    "no",
+                    "hello"
+                ],
+                "questionType": "multiplechoice",
+                "responseCount": 0
+            },
+            {
+                "id": 3,
+                "name": "is this test question ?",
+                "dateCreated": null,
+                "imageUrl": null,
+                "isActive": true,
+                "lastUpdated": null,
+                "option": [
+                    "yes",
+                    "no",
+                    "hello"
+                ],
+                "questionType": "multiplechoice",
+                "responseCount": 0
+            },
+            {
+                "id": 4,
+                "name": "is this test question ?",
+                "dateCreated": null,
+                "imageUrl": null,
+                "isActive": true,
+                "lastUpdated": null,
+                "option": [
+                    "yes",
+                    "no",
+                    "hello"
+                ],
+                "questionType": "multiplechoice",
+                "responseCount": 0
+            }
+        ],
+        "responses": 0,
+        "startTime": "2014-09-20T18:30:00Z",
+        "name": "test survey 88",
+        "isActive": true,
+        "lastUpdatedBy": {
+            "id": 1,
+            "name": null
+        },
+        "visibility": true,
+        "visibleTo": "EveryOne",
+        "cityList": [],
+        "countryList": [],
+        "status": "Draft",
+        "HashTag": [],
+        "surveyType": "sponsered",
+        "user": {
+            "id": 1,
+            "name": null
+        },
+        "surveyFlaggedCount": 0,
+        "commentFlaggedCount": 0
+    }]
+}

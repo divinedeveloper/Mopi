@@ -1,0 +1,65 @@
+package com.mopi.imageupload
+
+import java.util.Map;
+
+import com.amazonaws.services.s3.transfer.Upload
+
+import grails.converters.JSON
+
+import org.json.JSONObject
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
+
+@Secured('permitAll')
+class ProfileimageuploadController {
+
+	def s3UploadService
+	def profileimageService
+	Map responseObject = [:]
+    def index() { }
+	def uploadImage()
+	{
+		JSONObject dashboardJsonlist = new JSONObject();
+		String imageUrl=null
+		try{
+			
+			if(request)
+			{
+				def uploadedFile = request.getFile("myfile")
+				if(!uploadedFile.empty)
+				{
+					try
+					{
+						String pathname = "D:\\mopiImagetemp"
+						String originalFileExtension = uploadedFile.originalFilename.substring(uploadedFile.originalFilename.lastIndexOf("."))
+						uploadedFile.transferTo(new File(pathname+originalFileExtension))
+						pathname = pathname+originalFileExtension
+						Upload upload = s3UploadService.uploadFile(pathname,uploadedFile.originalFilename)
+						imageUrl=profileimageService.uploadImage(request,"https://s3-ap-southeast-1.amazonaws.com/mopi-tmp-media/"+uploadedFile.originalFilename,params.userId);
+					}
+					catch(Exception e)
+					{
+						imageUrl = "https://s3-ap-southeast-1.amazonaws.com/mopi-tmp-media/"+uploadedFile.originalFilename+originalFileExtension
+						println e.printStackTrace();
+					}
+				}
+				else
+				{
+					flash.message = "file cannot be empty"
+				}
+			}
+			println "0000"+imageUrl
+			dashboardJsonlist.put("imageUrl", imageUrl)
+			responseObject.error = false
+			responseObject.resp = dashboardJsonlist.map
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+		
+	}
+}

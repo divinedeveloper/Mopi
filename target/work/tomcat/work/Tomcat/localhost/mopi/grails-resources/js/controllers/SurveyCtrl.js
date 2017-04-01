@@ -1,0 +1,65 @@
+(function() {
+	'use strict';
+	angular
+			.module('app.survey', [])
+			.controller(
+					'SurveyCtrl',
+					[
+							'$scope',
+							'$filter',
+							'ngTableParams','$modal','Restangular','$rootScope',
+							function($scope, $filter, ngTableParams,$modal,Restangular,$rootScope) {
+								$scope.urlpath={}
+		$scope.searchparams=""
+			$scope.status=""
+				$scope.breadCrumb.hideBreadCrumb = false
+				$rootScope.breadcrum=[{"name":"Survey","url":"survey"}]
+				
+				$scope.statusavailable=[{"name":"Draft"},
+				                        {"name":"Active"},
+				                        {"name":"flagged"},
+				                        {"name":"Autohidden"},
+				                        {"name":"hidden"}]
+
+				
+								$scope.surveyresuts = new ngTableParams({
+									page : 1, // show first page
+									count : 10
+								// count per page
+								}, {
+									total : 0, // length of data
+									getData : function($defer, params) {
+									
+								$scope.urlpath.surveydetails=$scope.environment=="Development"?"surveys":$scope.staticjsonpath+"/getallsurvey.json";
+										  Restangular.one($scope.urlpath.surveydetails).get({"offset":(params.$params.page-1)*params.$params.count,"limit":params.$params.count,"name":$scope.searchparams,"status":$scope.status?$scope.status:""}).then(function (data) {
+											  params.total(data.resp.count)
+												$defer.resolve(data.resp.results);
+										  })
+									
+									}
+								});
+								
+								
+							/*	open modal box to create survey*/
+								$scope.openModal=function(){
+								   var modalInstance;
+							        modalInstance = $modal.open({
+							          templateUrl: "myModalContent.html"
+							        });
+							        modalInstance.result.then((function(selectedItem) {
+							          $scope.selected = selectedItem;
+							        }), function() {
+							          $log.info("Modal dismissed at: " + new Date());
+							        });
+								}
+						
+								               $scope.loadTags = function(query) {
+								                 return $http.get('tags.json');
+								               };
+								
+								
+							} ]);
+
+}).call(this);
+
+//# sourceMappingURL=TableCtrl.js.map

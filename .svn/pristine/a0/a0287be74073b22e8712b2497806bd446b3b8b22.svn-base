@@ -1,0 +1,33 @@
+package com.themopi.utils
+
+import java.util.Random;
+
+class GenerateDataUtils {
+	static final String POSSIBLE_STRING = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	static final String ROLEID = "234";
+	static Random random = new Random();
+
+	/**
+	 * Generates alphanumeric string of 5 characters 
+	 * @return
+	 * alphanumeric string of 5 chars
+	 */
+	def randomString() {
+		def randomString = ""
+		for(int i=0; i < 5;i++)
+		randomString += POSSIBLE_STRING.charAt( random.nextInt(POSSIBLE_STRING.length()));
+		return randomString
+	}
+	
+	/**
+	 * Gives role Id to be assigned for user
+	 * @return
+	 * either 2 or 3 or 4 as string
+	 */
+	def roleIdGenerator() {
+		def randomRoleId = ""
+		randomRoleId += ROLEID.charAt( random.nextInt(ROLEID.length()));
+		return randomRoleId
+	}
+	
+}

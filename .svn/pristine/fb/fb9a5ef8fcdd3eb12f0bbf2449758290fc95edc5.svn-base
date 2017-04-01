@@ -1,0 +1,284 @@
+<div class="page page-surveydetails" ng-controller="SurveydetailsCtrl">
+	<section class="panel panel-default table-dynamic">
+
+		<div class="panel-heading">
+
+			<div class="row">
+				<div class="form-group col-md-4">
+					<strong><i class="ti-user"></i>Survey Details</strong>
+				</div>
+				<div class="form-group col-md-4" ng-show="surveystatus=='created'">
+					<span class="label label-danger">{{survey.surveyFlaggedCount}}</span>
+					Flags
+				</div>
+				<div class="form-group col-md-4">
+					<span ng-show="surveystatus=='created'" class="ui-select"> <select
+						class="form-control" ng-change="changeStatus()" chosen
+						disable-search="true" ng-model="survey.status"
+						ng-options="stat.status as stat.name for stat in (survey.status=='Active' && (status | filter:{status:'!Draft'}) || status) ">
+							<option value=""></option>
+					</select>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body form-group col-md-offset-1">
+			<form name="Form">
+				<div class="row">
+					<div class="form-group col-md-4 ">
+						<div class="" ng-file-select="onFileSelect($files)" style="margin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+							<img id="giftimage" src="images/assets/600_400-2.jpg" alt="" ng-src="{{survey.imageUrl}}" style="height: 172px;">
+
+						</div>
+					</div>
+
+					<div class="form-group col-md-7" style="margin-top: 30px;">
+
+						<div class="form-group">
+							<div class="row" ng-show="surveystatus=='created'">
+								<div class="form-group col-sm-10">
+
+									<label for="inputEmail3" class="form-group col-md-10" ng-show="!edit">Survey Code: {{survey.surveyCode}}</label>
+
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+
+									<label for="inputEmail3" class="form-group col-md-10" ng-show="!edit">Survey Name: {{survey.name}}</label>
+									<span ng-show="edit && survey.status !='Active'"><input
+										type="text" class=" form-control" ng-model="survey.name"
+										id="inputPassword3" placeholder="Survey Name"
+										name="requireWatch" validator="required"
+										required-error-message="Survey name is required"
+										autofocus="autofocus"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+								    
+									<label for="inputEmail3" class="form-group col-md-10 " ng-show="!edit">Hash tags:<span
+										ng-repeat="data in survey.tags" ng-show="survey.tags.length>0"> #{{data.text}}<span ng-if="survey.tags.length != $index+1">,</span></span>
+										<span ng-show="survey.tags.length==0">Hash tags: No Hash Tags</span> </label> <span
+										ng-show="edit"> <tags-input ng-model="survey.tags"
+											class="ui-tags-input"> <auto-complete
+											source="loadTags($query)"></auto-complete></tags-input>
+									</span>
+								</div>
+							</div>
+							
+							<div class="row">
+
+								<div class="form-group col-sm-5">
+									<label ng-show="!edit" class="form-group col-md-10 "> Visible To:
+										<span ng-show="survey.visibleTo=='EveryOne'">Public</span> <span
+										ng-show="survey.visibleTo=='Followers'">Followers</span>
+									</label> <span ng-show="edit && survey.status!='Active'"><select
+										class="form-control" chosen disable-search="true"
+										ng-model="survey.visibleTo" data-placeholder="Visible To"
+										ng-options="visible.value as visible.name for visible in visibleto">
+											<option value=""></option>
+									</select> </span>
+								</div>
+								
+								<div class="form-group col-sm-5">
+									<label ng-show="!edit" class="form-group col-md-10 "> Show Results:
+										<span ng-show="survey.visibility==true">Yes</span> <span
+										ng-show="survey.visibility==false">No</span>
+									</label> <span ng-show="edit && survey.status!='Active'"><select
+										class="form-control" chosen disable-search="true"
+										ng-model="survey.visibility" data-placeholder="Show Results?"
+										ng-options="result.value as result.name for result in showResults">
+											<option value=""></option>
+									</select> </span>
+								</div>
+
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+									<label for="inputEmail3" class="form-group col-sm-10 " ng-show="!edit">Country:<span
+										ng-repeat="data in survey.countryList"
+										ng-show="survey.countryList.length>0"> #{{data}}<span ng-if="survey.countryList.length != $index+1">,</span></span> <span
+										ng-show="survey.countryList.length==0 || survey.countryList==null">No
+											Country Tags</span> </label> <span ng-show="edit && survey.status!='Active'"><tags-input
+											placeholder="Select Country" ng-model="survey.countrytag"
+											class="ui-tags-input"> <auto-complete
+											source="loadcities($query)"></auto-complete></tags-input></span>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+
+				</div>
+				
+				<div class="row">
+
+					<div class="form-group">
+
+						<div class="form-group col-sm-10">
+							<label ng-show="!edit">City:<span ng-show="!edit" ng-repeat="data in survey.cityList"
+								ng-show="survey.cityList.length>0"> #{{data}}<a
+									ng-show="$last==false">,</a></span><span
+								ng-show="survey.cityList.length==0|| survey.cityList==null">No
+									city Tags</span></label>
+						
+							<div ng-show="edit && survey.status!='Active'"  class="ui-tags-input">
+							<div  class="tags">
+								<ul class="tag-list">
+									<!-- ngRepeat: tag in tagList.items track by track(tag) -->
+									<li class="tag-item " ng-repeat="data in survey.cityList"><span>{{data}}</span>
+										<a class="remove-button ti-close" style="font-size: 9px;" ng-click="survey.cityList.splice($index,1)"></a></li>
+								</ul>
+								<input ng-model="user.location" ng-autocomplete
+								options="options" details="details"   placeholder="Select City"
+									class="input"
+									><span class="input"
+									style="visibility: hidden; width: auto; white-space: pre; display: none;">Select
+									Country</span>
+							</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+				
+				<div class="row">
+
+
+					<div class="form-group">
+						<div class="form-group col-sm-4">
+							<label for="datepickerbegin" class="form-group col-sm-4 control-label">Begin
+								on</label>
+							<div class="input-group ui-datepicker" id="datepickerbegin">
+								<input type="text" ng-model="survey.startTime" ng-change=""
+									datepicker-popup="yyyy-MM-dd" data-container="body"
+									data-min-date="today" class="form-control" name="date"
+									data-autoclose="true"
+									ng-disabled="!edit || survey.status =='Active'" bs-datepicker>
+							</div>
+
+						</div>
+						<div class="form-group col-sm-4">
+							<label for="datepickerend" class="form-group col-sm-3 control-label">End
+								on</label>
+							<div id="datepickerend" class="input-group ui-datepicker">
+								<input type="text" ng-model="survey.endTime"
+									data-min-date="{{survey.startTime}}"
+									datepicker-popup="yyyy-MM-dd" data-container="body"
+									class="form-control" name="date" data-autoclose="true"
+									ng-disabled="!survey.startTime || survey.status =='Active' || !edit"
+									bs-datepicker>
+							</div>
+
+						</div>
+			<div class="form-group col-sm-4"
+							ng-show="surveystatus=='created'">
+							<a ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN'])" href="#gift/{{surveyid}}/{{survey.gift?survey.gift.id:'newgift'}}">Gifts</a>
+							<a  ng-show="authenticationfunction(['ROLE_SUPERADMIN']) && survey.gift.id" href="#gift/{{surveyid}}/{{survey.gift?survey.gift.id:'newgift'}}">Gifts</a>
+						</div>
+
+
+
+					</div>
+
+
+				</div>
+				
+				<div class="row" ng-show="surveystatus=='created'">
+					<div class="form-group col-md-4 form-group" ng-show="authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN'])">
+						<span class="label label-danger">{{survey.commentFlaggedCount}}</span>
+						<a href="#comments/{{surveyid}}" > Comments Flagged</a>
+			
+					</div>
+					<div class="form-group col-md-4 form-group" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN'])">
+						<span class="label label-danger">{{survey.commentCount}}</span>
+						<a href="#comments/{{surveyid}}"> Comments on Survey</a>
+					</div>
+					
+				</div>
+				
+				<div class="row text-center">
+
+
+
+					<button ng-show="edit" class="btn btn-w-md btn-gap-v btn-success"
+						type="button"
+						ng-click="form.submit(Form);createSurvey(form.checkValid(Form))">Save</button>
+					<button ng-show="!edit && authenticationfunction(['ROLE_SPONSEREDADMIN'])" ng-click="edit=true"
+						class="btn btn-w-md btn-gap-v btn-success">Edit</button>
+					<button ng-show="edit" ng-click="edit=false"
+						class="btn btn-w-md btn-gap-v btn-info">Cancel</button>
+
+				</div>
+
+			</form>
+		</div>
+
+	</section>
+
+	<section
+		ng-show="surveystatus=='created' && authenticationfunction(['ROLE_SUPERADMIN','ROLE_SPONSEREDADMIN'])"
+		class="panel panel-default table-dynamic" style="margin-top: 2%;">
+		<div class="panel-heading" style="min-height: 40px;">
+			<div class="form-group col-md-4 form-group">
+				<strong><span class="glyphicon glyphicon-th"></span> Survey
+					Question(Max 15)</strong>
+			</div>
+
+			<div class="form-group col-md-4 form-group" ng-show="survey.questionList.length>0">
+				<a href="" click-link="surveychartdetails/{{surveyid}}">Summary</a>
+			</div>
+			<div class="form-group col-md-4 form-group" style="margin-top: -6px;" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN']) && survey.status !='Active'">
+				<button class="btn btn-info  btn-sm"
+					click-link="question/newquestion/{{surveyid}}">
+					<span class="ti-plus"></span>Add Question
+				</button>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="form-group">
+					<div class="form-group col-sm-12">
+
+						<table class="table table-responsive table-hover table-bordered table-striped">
+
+							<tbody>
+								<tr ng-repeat="data in survey.questionList"
+									ng-click="questionredirect(authenticationfunction(['ROLE_SPONSEREDADMIN']),data.id,surveyid,survey.status)">
+									<td>{{$index+1}}</td>
+									<td>{{data.name}}</td>
+									<td>{{data.responseCount}} Responses</td>
+									<td>
+										<div ng-if="data.questionType=='multiplechoice'"
+											class="icon-container">
+											<span class="ti-check-box"></span>MCQ
+										</div>
+										<div ng-if="data.questionType=='binary'"
+											class="icon-container">
+											<span class="icon-circle-full"></span> Binary
+										</div>
+										<div ng-if="data.questionType=='text'" class="icon-container">
+											<span class="ti-comment-alt"></span> Text
+										</div>
+										<div ng-if="data.questionType=='scale'" class="icon-container">
+											<span class="ti-layout-slider"></span> Slider
+										</div>
+									</td>
+								</tr>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+</div>

@@ -1,0 +1,25 @@
+package com.themopi.survey
+
+import com.themopi.account.User;
+import com.themopi.user.Profile;
+
+class Gift {
+	
+	//type will be enum
+	String type, imageUrlG, code, text
+	Boolean isAvailable
+	int maxNo
+	Date dateCreated, lastUpdated
+	User user
+	
+    static constraints = {
+		code unique: true , blank:false , nullable:false
+		type nullable:true
+		imageUrlG nullable:true
+		text nullable:true 
+		dateCreated nullable:true
+		lastUpdated nullable:true
+		maxNo nullable:true
+		user nullable:true
+	}
+}

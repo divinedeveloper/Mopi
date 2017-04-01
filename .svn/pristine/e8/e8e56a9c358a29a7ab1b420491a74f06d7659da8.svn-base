@@ -1,0 +1,36 @@
+<div class="modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="$hide();">&times;</button>
+				<h3 class="modal-title">Add Choice</h3>
+				<!--             <h3 class="modal-title" ng-show="type=='edit'">Edit User</h3> -->
+			</div>
+			<div class="modal-body">
+
+	<div ng-file-select="mcqonFileSelect($files)" class="" style="margin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+				<img id='mcqimage' src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" 
+				 alt="" style="height: 172px;width: 172px;" ng-src="{{mcq.image}}">
+						</div>
+				<div class="form-horizontal" style="margin-top:5px;">
+					<div class="form-group">
+						<label for="" class="col-sm-2">Choice</label>
+						<div class="col-sm-10" id="{{$index+1}}" >
+							<input ng-model="mcq.value" type="text" class="form-control">
+							<span ng-show="enterchoice" class="validation-invalid">Please Enter choice!!</span>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary"  ng-click="cancel(mcq,qtype)">Cancel</button>
+				<button ng-show="editmode==false" class="btn btn-success"
+					ng-click="addmcqstns(mcq,index,'new')">Save</button>
+					<button ng-show="editmode==true" class="btn btn-success"
+					ng-click="addmcqstns(mcq,index,'edit')">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,49 @@
+<div ng-controller="BinaryCtrl">
+
+	<div class="row">
+		<div class="col-md-10 center-block" style="float:none">
+			<div class="col-md-2" ng-file-select="onFileSelect($files,'1')">
+				<img  class="img-thumbnail" id="giftimage1"
+					alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+"
+				ng-src="{{questiondetails.imageUrlQ}}"	style="width: 140px; height: 140px;">
+			</div>
+
+			<div class="col-md-2">
+
+				<select class="form-control" 
+					ng-options="ques.name for ques in binaryquestionoptions"
+					ng-model="typeoption" chosen data-placeholder="Select"
+					disable-search="true" allow-single-deselect="false">	
+				</select>
+			
+			</div>
+			<div class="col-md-1"> OR</div>
+			<div class="col-md-6">
+	
+				<form class="form-inline" role="form">
+					<div class="form-group">
+						 <label class="sr-only" for="exampleInputEmail2">Email
+							address</label> <input ng-model="userinput.one"
+							ng-disabled="typeoption.bind=='yes/no' || !typeoption" type="text"
+							class="form-control" placeholder="User Input 1">
+					</div>
+					<span>/</span>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputEmail2">Email
+							address</label> <input type="text" class="form-control"
+							ng-model="userinput.two" ng-disabled="typeoption.bind=='yes/no' || !typeoption"
+							placeholder="User Input 2">
+					</div>
+
+				</form>
+			</div>
+		</div>
+
+	</div>
+		<div class="row text-center">
+		<div class="form-group">
+	<button class="btn btn-w-md btn-gap-v btn-success"
+		ng-click="saveQuestion()" type="button">Save</button>
+		</div>
+		</div>
+</div>

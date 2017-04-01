@@ -1,0 +1,13 @@
+<div ng-controller="UsersurveysCtrl">
+<div class="table-responsive">
+	<table ng-table="sponsorusersurvey" class="table table-responsive table-hover table-bordered">
+			<tr ng-repeat="user in $data" click-link="surveydetails/{{user.id}}">
+				<td data-title="''" width="30"><img
+					class="img-rounded img64_64" src="images/g1.jpg" alt=""></td>
+				<td data-title="''" style="vertical-align: middle;">{{user.name}}</td>
+				<td data-title="''" style="vertical-align: middle;">{{user.commentCount}}  Comments</td>
+				<td data-title="''" style="vertical-align: middle;">{{user.responses}}  Responses</td>
+			</tr>
+		</table>
+		</div>
+</div>

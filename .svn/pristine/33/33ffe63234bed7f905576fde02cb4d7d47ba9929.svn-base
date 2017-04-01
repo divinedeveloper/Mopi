@@ -1,0 +1,185 @@
+<div class="page page-dashboard" data-ng-controller="DashboardCtrl">
+
+    <section>
+        <section class="panel panel-default">
+            <div class="panel-heading"><strong><span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;&nbsp; Global view of Users</strong></div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="ui-map" ui-jvectormap options="worldMap"></div>
+                    </div>
+<!--                     <div class="col-lg-4"> -->
+<!--                         <h3 class="text-thin">Statistics</h3> -->
+<!--                         <div class="divider divider-dashed"></div> -->
+<!--                         <p>Bounce Rate</p> -->
+<!--                         <progressbar class="progressbar-xs progress-rounded" value="34" type="success"></progressbar> -->
+<!--                         <p>New Visists</p> -->
+<!--                         <progressbar class="progressbar-xs progress-rounded" value="68" type="info"></progressbar> -->
+<!--                         <p>Search Traffic</p> -->
+<!--                         <progressbar class="progressbar-xs progress-rounded" value="52" type="warning"></progressbar> -->
+<!--                         <p>Modern Browsers</p> -->
+<!--                         <progressbar class="progressbar-xs progress-rounded" value="77" type="danger"></progressbar>                         -->
+<!--                     </div> -->
+                </div>
+            </div>
+        </section>
+    </section> 
+
+
+    <!-- Stats -->
+    <div class="row text-center">
+        <div class="col-lg-3 col-xsm-6">
+            <div class="panel mini-box" click-link="user">
+                <span class="btn-icon btn-icon-round btn-icon-lg-alt bg-success">
+                    <span class="ti-user"></span>
+                </span>
+                <div class="box-info">
+                    <p class="size-h2">{{usersaccount.TotalUser}} <span class="size-h4"></span></p>
+                    <p class="text-muted"><span data-i18n="Total Users">
+                    </span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xsm-6">
+            <div class="panel mini-box" click-link="user">
+                <span class="btn-icon btn-icon-round btn-icon-lg-alt bg-info">
+                    <i class="ti-user"></i>
+                </span>
+                <div class="box-info">
+                    <p class="size-h2">{{usersaccount.RecentUser}} <span class="size-h4"></span></p>
+                    <p class="text-muted"><span data-i18n="Recent Users"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xsm-6">
+            <div class="panel mini-box" click-link="survey">
+                <span class="btn-icon btn-icon-round btn-icon-lg-alt bg-warning">
+                    <i class="ti-notepad"></i>
+                </span>
+                <div class="box-info">
+                    <p class="size-h2">{{usersaccount.TotalSurvey}} </p>
+                    <p class="text-muted"><span data-i18n="Total Surveys"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xsm-6">
+            <div class="panel mini-box" click-link="survey">
+                <span class="btn-icon btn-icon-round btn-icon-lg-alt bg-danger">
+                    <i class="ti-notepad"></i>
+                </span>
+                <div class="box-info">
+                    <p class="size-h2">{{usersaccount.RecentSurvey}}</p>
+                    <p class="text-muted"><span data-i18n="Recent Surveys"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end stats -->
+ <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Country Wise Distribution</h3>
+                </div>
+                <div class="panel-body">
+            
+                    <div data-flot-chart
+                         data-data="country.data"
+                         data-options="pieChart.options"
+                         style="width: 100%; height: 300px;"></div> 
+                </div>
+            </div>
+        </div>
+             <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Points Wise User Distribution</h3>
+                </div>
+                <div class="panel-body">
+                    <div data-flot-chart
+                         data-data="points.data"
+                         data-options="pieChart.options"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>
+        </div>
+             <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Religion Wise Distribution</h3>
+                </div>
+                <div class="panel-body">
+                    <div data-flot-chart
+                         data-data="religion.data"
+                         data-options="pieChart.options"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+            <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Age</h3>
+                </div>
+                <div class="panel-body">
+                    <div data-flot-chart
+                         data-data="age.data"
+                         data-options="barchartoptions"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>            
+        </div>
+              <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Gender</h3>
+                </div>
+                <div class="panel-body">
+                    <div data-flot-chart
+                         data-data="gender.data"
+                         data-options="barchartoptions"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>            
+        </div>
+              <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Occupation</h3>
+                </div>
+                <div class="panel-body">
+
+   <div data-flot-chart
+                         data-data="occupation.data"
+                         data-options="pieChart.options"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>            
+        </div>
+              <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Income</h3>
+                </div>
+                <div class="panel-body">
+                    <div data-flot-chart
+                         data-data="income.data"
+                         data-options="barchartoptions"
+                         style="width: 100%; height: 300px;"
+                         ></div>
+                </div>
+            </div>            
+        </div>
+        </div>
+        
+
+</div>
+  

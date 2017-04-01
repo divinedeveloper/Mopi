@@ -1,0 +1,903 @@
+package com.themopi.surveyactivity
+
+import grails.transaction.Transactional
+
+import java.text.Format
+import java.text.SimpleDateFormat
+
+import com.themopi.account.*
+import com.themopi.exceptions.SurveyException
+import com.themopi.survey.Gift
+import com.themopi.survey.HashTag
+import com.themopi.survey.Question
+import com.themopi.survey.Survey
+import com.themopi.survey.SurveyReports
+import com.themopi.utils.IDUtils
+
+@Transactional
+class SurveyService {
+	static transactional = 'mongo'
+	
+	def UserService
+	def hashTagService
+	def grailsApplication
+	def locationService
+	
+	IDUtils idGenrator = new IDUtils();
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	
+	
+	def serviceMethod() {
+	}
+
+
+	/**
+	 * function to find the survey type for survey
+	 *
+	 * @param userRole
+	 * @param body (json payload)
+	 * @return (survey type sponsered/nonsponsered)
+	 */
+	def findSurveyType(userRole,body){
+		def surveyType = body.surveyType
+		println "surveyType  "+surveyType
+		if((surveyType != null)){
+			println "in func"+surveyType
+			return surveyType
+		}
+		String survey = "sponsered"
+		println survey
+		if(userRole?.role?.authority == "ROLE_SPONSEREDADMIN"){
+			println survey
+			return survey
+		}
+		survey = "nonsponsered"
+		println survey
+		return survey
+	}
+
+	/**
+	 * function accepts the request from the request
+	 * Extract the X-Auth-Token from the header
+	 * Determine the type of the Survey
+	 * Create new survey
+	 * @param request
+	 * @return survey object
+	 */
+	def createSurvey(request){
+		int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.errorCode
+		int status = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.status
+		String message = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.message
+		String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.extendedMessage
+		String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.moreInfo
+		if(request.getJSON().name  == null || request.getJSON().name == ""){
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		String surveyType = findSurveyType(userRole,request.getJSON())
+		println surveyType
+		println "role == "+userRole.user
+		def countryObjectList = request.getJSON().countryList
+		if(request.getJSON().isNull('countryList')){
+			countryObjectList = []
+		}
+
+		def cityObjectList = request.getJSON().cityList
+		if(request.getJSON().isNull('cityList')){
+			cityObjectList = []
+		}
+		println " request.getJSON().   --- "+ request.getJSON().imageUrl
+		
+		// validate start and end dates
+		String stringStartDate = (request.getJSON().isNull('startTime'))?null:request.getJSON().startTime
+		String stringEndDate = (request.getJSON().isNull('endTime'))?null:request.getJSON().endTime
+		
+		boolean flag = validateStartAndEndDate(stringStartDate,  stringEndDate)
+
+		
+		
+		Survey survey = new Survey(
+				name:request.getJSON().name,
+				surveyType:surveyType,
+				surveyCode:idGenrator.generateID()+"-"+userRole?.user?.name,
+				lastUpdatedBy:userRole.user,
+				status:"Draft",
+				visibility:(request.getJSON().isNull('visiblity'))?true:request.getJSON().visiblity , //need to handle visiblity option later
+				startTime:(request.getJSON().isNull('startTime'))?null:formatter.parse(request.getJSON().startTime),
+				endTime:(request.getJSON().isNull('endTime'))?null:formatter.parse(request.getJSON().endTime),
+				user:userRole.user,
+				visiblityCountry:countryObjectList,
+				visiblityCity:cityObjectList,
+				visibleTo:(request.getJSON().isNull('visibleTo'))?"EveryOne":request.getJSON().visibleTo
+				)
+		
+		
+		def hashTags  = request.getJSON().hashTags
+
+
+		if(!survey.save()){
+			survey.errors.each{ println  it; }
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}else{
+			incrementSurveyCount(userRole.user)
+		}
+		if(hashTags != null && hashTags.size() != 0){
+			survey = getHashTagAddedToSurvey(hashTags,userRole,survey);
+			survey.save()
+		}
+		return survey
+	}
+
+
+	/**
+	 * function accepts the request from the request
+	 * Extract the X-Auth-Token from the header
+	 * Determine the type of the Survey
+	 * update survey onlyif it is in draft mode
+	 * @param request
+	 * @return survey object
+	 */
+	def updateSurvey(request,surveyId){		
+		Survey survey = getSurveyById(surveyId)
+
+		println "survey---+survey"+survey
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+
+		//check owner of survey
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			println "check owner"
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		
+		if("Draft".equals(survey?.status.toString())){
+
+			if(survey.questions.size == 0 && request.getJSON().status == "Active"){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+
+			if(request.getJSON().name  == null || request.getJSON().name == ""){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.survey.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+			
+			String surveyType = findSurveyType(userRole,request.getJSON())
+
+			def countryObjectList = request.getJSON().countryList
+			if(request.getJSON().isNull('countryList')){
+				countryObjectList = []
+			}
+
+			def cityObjectList = request.getJSON().cityList
+			if(request.getJSON().isNull('cityList')){
+				cityObjectList = []
+			}
+
+
+			survey.name=request.getJSON().name
+			survey.surveyType=surveyType
+			survey.lastUpdatedBy=userRole.user
+			survey.status= request.getJSON().status
+			survey.visibility = (request.getJSON().isNull('visibility'))?true:request.getJSON().visibility //need to handle visiblity option later
+			survey.startTime = (request.getJSON().isNull('startTime'))?null:formatter.parse(request.getJSON().startTime)
+			survey.endTime = (request.getJSON().isNull('endTime'))?null:formatter.parse(request.getJSON().endTime)
+			survey.visiblityCountry = countryObjectList
+			survey.visiblityCity = cityObjectList
+			survey.visibleTo= (request.getJSON().isNull('visibleTo'))?"EveryOne":request.getJSON().visibleTo
+			
+			if(!survey.gift==null)
+			{
+				survey.gift = survey.gift
+			}
+			else
+			{
+				survey.gift.id=survey.gift.id
+				survey.gift.code=survey.gift.code
+				survey.gift.isAvailable=survey.gift.isAvailable
+				survey.gift.maxNo=survey.gift.maxNo
+				survey.gift.text=survey.gift.text
+				survey.gift.user=survey.user
+				
+			}
+			def hashTags  = request.getJSON().hashTags
+			if(hashTags != null && hashTags.size() != 0){
+				survey = getHashTagAddedToSurvey(hashTags,userRole,survey);
+			}
+			
+			if(!survey.save()){
+				survey.errors.each{ println  it; }
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+			return survey
+
+
+		}else if("Active".equals(survey?.status.toString())){
+			survey = updateOnlyHashtag(request,survey, userRole)
+
+			return survey
+
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	/**
+	 * function to update the status of the Survey
+	 *status cannot be changed from other than draft mode back to draft mode
+	 * @param body
+	 * @param surveyId
+	 * @return
+	 */
+
+	def updateSurveyStatus(body,surveyId,tokenValue){
+		Survey survey = getSurveyById(surveyId)
+
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			if(!(userRole?.user?.roleAuthority == "ROLE_SUPERADMIN" || userRole?.user?.roleAuthority == "ROLE_ADMIN")){
+				int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+				int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+				String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+				String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+
+			}
+		}
+
+		//cannot change status of survey from active and any other state back to draft mode
+		if(!("Draft".equals(survey?.status.toString())) && body.status == "Draft"){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroThree.surveyActiveStatus.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroThree.surveyActiveStatus.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroThree.surveyActiveStatus.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroThree.surveyActiveStatus.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroThree.surveyActiveStatus.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+
+		if(survey.questions.size == 0 && body.status == "Active"){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyActiveStatus.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+
+		survey.status = body.status
+		survey.save()
+		return survey
+	}
+
+	/**
+	 * function to get SurveyByID
+	 *
+	 * @param surveyId
+	 * @return
+	 */
+
+	def getSurveyById(surveyId){
+		println "-----------surveyId------------"
+		println surveyId
+		Survey survey = Survey.findById(surveyId)
+		println survey
+		if(survey == null){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroFour.survey.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroFour.survey.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroFour.survey.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroFour.survey.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroFour.survey.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		return survey
+	}
+
+	/**
+	 * Add hashtags to the survey
+	 *
+	 * @param hashTags
+	 * @param userRole
+	 * @param survey
+	 * @return
+	 */
+	public Survey getHashTagAddedToSurvey(hashTags,userRole,survey){
+		def hashTagList = []
+		for(int i = 0;i < hashTags.size();i++){
+			HashTag hashTag = HashTag.findByName(hashTags[i]);
+			println hashTag
+			if(hashTag == null){
+				hashTag = hashTagService.createHashTag(hashTags[i],userRole.user)
+				
+			}
+			hashTagList.add(hashTag)
+		}
+		println hashTagList
+		survey.hashTag = hashTagList
+		return survey
+		
+	/*	for(int i = 0;i < hashTags.size();i++){
+			HashTag hashTag = HashTag.findByName(hashTags[i]);
+			if(hashTag == null){
+				hashTag = hashTagService.createHashTag(hashTags[i],userRole.user)
+			}
+			println hashTag
+			SurveyHashTag  surveyHashTag = SurveyHashTag.findBySurveyAndHashTag(survey,hashTag)
+			println survey
+			println hashTag
+			if(surveyHashTag == null){
+				SurveyHashTag	surveyHashTagNew = new SurveyHashTag(
+						survey:survey,
+						hashTag:hashTag
+						)
+
+				if(!surveyHashTagNew.save()){
+					surveyHashTagNew.errors.each{ println it }
+				}
+			}*/
+
+	}
+	
+	def checkActionAllowedOnlyIfSurveyIsNotActive(survey){
+		if("Active".equals(survey?.status.toString())){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroThree.survey.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+
+	/**
+	 *
+	 * Function to add question to a Survey
+	 * @param body (Json Payload)
+	 * @param surveyId
+	 * @param tokenValue
+	 * @return
+	 */
+	def addQuestionToSurvey(body,surveyId,tokenValue){
+		Survey survey = getSurveyById(surveyId)
+		checkActionAllowedOnlyIfSurveyIsNotActive(survey)
+		
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+
+		//check owner of survey
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+
+		if(survey.questions.size() == 15){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyQuestionCount.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyQuestionCount.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyQuestionCount.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyQuestionCount.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyQuestionCount.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		
+		def option = []
+		if(body.questionType == "binary"){
+			option = body.option
+			if(body.option.size() < 2){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}else if(body.questionType == "scale") {
+			option = body.option
+			if(body.option.size() < 2){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}else if(body.questionType == "multiplechoice"){
+			option = body.option
+			if(body.option.size() < 2 || body.option.size() > 6){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}
+
+		Question question = new Question(
+				query:body.query,
+				questionType:body.questionType,
+				lastUpdatedBy:userRole.user,
+				option:option,
+				isActive:(body.isNull("isActive")||body.isActive == "")?true:body.isActive
+				)
+
+		if(!question.save()){
+			question.errors.each{ println it }
+		}else{
+			println "question save"+question.findAll()
+			survey.questions.add(question)
+			survey.save()
+		}
+
+		return question
+	}
+	
+	/**
+	 *
+	 * function particular question of a survey
+	 * @param surveyId
+	 * @param tokenValue
+	 * @param questionId
+	 * @return
+	 */
+	def findQuestionInSurvey(surveyId,tokenValue,questionId){
+		Survey survey = getSurveyById(surveyId)
+		Question question = null
+		println "surveys == "+survey.questions
+		
+		survey.questions.each{
+			println it.id
+			if( it.id == questionId.toInteger()){
+				question = it
+				println it
+			}
+		}
+		if(question == null){
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroFour.surveyQuestion.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroFour.surveyQuestion.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroFour.surveyQuestion.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroFour.surveyQuestion.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroFour.surveyQuestion.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		return question
+	}
+	
+	
+	/**
+	 *
+	 * function to edit a question of a particular server
+	 * @param body (Json PayLoad)
+	 * @param surveyId
+	 * @param tokenValue
+	 * @param questionId
+	 * @return
+	 */
+
+	def editQuestionInSurvey(body,surveyId,tokenValue,questionId){
+		Survey survey = getSurveyById(surveyId)
+		checkActionAllowedOnlyIfSurveyIsNotActive(survey)
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		
+		//check owner of survey
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		
+		def option = []
+		if(body.questionType == "binary"){
+			option = body.option
+			if(body.option.size() < 2){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}else if(body.questionType == "scale") {
+			option = body.option
+			if(body.option.size() < 2){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoice.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}else if(body.questionType == "multiplechoice"){
+			option = body.option
+			if(body.option.size() < 2 || body.option.size() > 6){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.multipleChoiceOption.moreInfo
+	
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}
+		println body.questionType
+		def questionList = []
+		Question question = null
+		survey.questions.each{
+			println it.id
+			if( it.id == questionId.toInteger()){
+				question = it
+				println it
+			}else{
+				questionList.add(it)
+			}
+		}
+
+		question.query=body.query
+		question.questionType=body.questionType
+		question.lastUpdatedBy=userRole.user
+		question.option=option
+		question.isActive=(body.isNull("isActive")||body.isActive == "")?true:body.isActive
+
+		questionList.add(question)
+		if(!question.save(flush:true)){
+			question.errors.each{ println it }
+		}
+		survey.questions = questionList
+		if(!survey.save()){
+			survey.errors.each{
+				println it
+			}
+		}
+		
+		println survey.questions
+		return question
+		
+	}
+
+	
+	
+	/**
+	 *
+	 * function to edit a question of a particular server
+	 * @param body (Json PayLoad)
+	 * @param surveyId
+	 * @param tokenValue
+	 * @param questionId
+	 * @return
+	 */
+
+	def deleteQuestionInSurvey(surveyId,tokenValue,questionId){
+		Survey survey = getSurveyById(surveyId)
+		checkActionAllowedOnlyIfSurveyIsNotActive(survey)
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		
+		//check owner of survey
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+				
+		def questionList = []
+		Question question = null
+		survey.questions.each{
+			println it.id
+			if( it.id == questionId.toInteger()){
+				question = it
+				println it
+			}else{
+				questionList.add(it)
+			}
+		}
+		survey.questions = questionList
+		if(!survey.save()){
+			survey.errors.each{
+				println it
+			}
+		}
+		println survey.questions
+		return survey.questions
+}
+	/**
+	 *
+	 * returns all the survey
+	 * support pagination
+	 */
+
+	List findAllSurvey(offset,limit){
+		offset = (offset == null )?0:offset
+		limit  = (limit == null)?10:limit
+		List surveys = Survey.createCriteria().list(max:limit, offset:offset){  }
+		return surveys
+	}
+	
+	/**
+	 * function to delete user and decrease the survey count of user by 1
+	 *
+	 * @param surveyId
+	 * @return
+	 */
+	def deleteSurvey(surveyId, tokenValue){
+		println surveyId
+		Survey survey = getSurveyById(surveyId)
+		
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		boolean isOwner = checkOwnerOfSurvey(survey, userRole)
+
+		if(!isOwner){
+			if(!(userRole?.user?.roleAuthority == "ROLE_SUPERADMIN" || userRole?.user?.roleAuthority == "ROLE_ADMIN")){
+				int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+				int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+				String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+				String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+
+			}
+		}
+		
+		if(survey.isActive){
+			survey.isActive = false
+			if(!survey.save(flush:true)){
+				survey.errors.each{ println it  }
+			}else{
+				decrementSurveyCount(survey)
+			}
+		}
+	}
+	
+	/*
+	 * function to increase the survey count of user by 1
+	 */
+	def incrementSurveyCount(user){
+		user.surveyCount  = user.surveyCount + 1
+		user.save()
+	}
+	
+	/*
+	 * function to decrease the survey count of user by 1
+	 */
+	def decrementSurveyCount(survey){
+		survey.user.surveyCount = survey.user.surveyCount - 1;
+		survey.user.save()
+	}
+	
+	/**
+	 * if survey is in active mode only hash tags can be updated
+	 * @param request
+	 * @param survey
+	 * @param userRole
+	 * @return
+	 */
+	def updateOnlyHashtag(request,survey, userRole){
+		def hashTags  = request.getJSON().hashTags
+		if(hashTags != null && hashTags.size() != 0){
+			survey = getHashTagAddedToSurvey(hashTags,userRole,survey);
+			survey.save()
+		}
+		return survey
+	}
+	
+	/**
+	 * check if user is owner of survey
+	 * if yes returns true
+	 * else return false
+	 * @param survey
+	 * @param userRole
+	 * @return
+	 */
+	def checkOwnerOfSurvey(survey, userRole){
+		boolean flag = false;
+
+		if(survey.user.id == userRole.user.id){
+			flag = true
+			return flag
+		}else{
+			return flag
+		}
+
+	}
+	
+	/**
+	 * validation for start and end date
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	def validateStartAndEndDate(String startTime, String endTime){
+		if(endTime != null){
+			if(startTime != null){
+				boolean flag = startDateGreaterThanCurrentDate(startTime)
+				if(flag){
+					return startDateGreaterThanEndDate(startTime, endTime)
+				}
+			}else{
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.startEndDateValidation.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.startEndDateValidation.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.startEndDateValidation.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.startEndDateValidation.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.startEndDateValidation.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+			}
+		}else{
+			if(startTime == null){
+				return true
+			}else{
+				return startDateGreaterThanCurrentDate(startTime)
+			}
+		}
+	}
+	
+	/**
+	 * method checks whether start date is greater than end date
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 */
+	def startDateGreaterThanEndDate(String startTime, String endTime){
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd")
+		Date parsedStartDate = formatter.parseObject(startTime)
+		Date parsedEndDate = formatter.parseObject(endTime)
+		
+		if(parsedEndDate >= parsedStartDate){
+			return true
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateGreaterThanEndDate.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateGreaterThanEndDate.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateGreaterThanEndDate.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateGreaterThanEndDate.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateGreaterThanEndDate.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	
+	/**
+	 * method checks whether start date is greater than end date
+	 * @param startTime
+	 * @return
+	 */
+	def startDateGreaterThanCurrentDate(String startTime){
+		Date currentDate = new Date()
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd")
+		String currentFormattedDate = formatter.format(currentDate)
+		Date parsedCurrentDate = formatter.parseObject(currentFormattedDate)
+		
+		//			String startFormattedDate = formatter.format(startTime)
+		Date parsedStartDate = formatter.parseObject(startTime)
+		println "parsedStartDate is "+parsedStartDate
+		if(parsedStartDate >= parsedCurrentDate){
+			return true
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateValidation.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateValidation.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateValidation.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateValidation.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.startDateValidation.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	
+	def createSurveyReport(request,surveyId,tokenValue)
+	{
+		Survey survey = getSurveyById(surveyId)
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user
+		SurveyReports surveyReports
+		try
+		{
+			if(survey.isActive)
+			{
+				 surveyReports = new SurveyReports(reportedBy:user,reportedOn:survey,user:user,survey:survey,
+											  text:(request.getJSON().isNull('text'))?true:request.getJSON().text,isDeleted:true);
+				  if(!surveyReports.save(flush:true)){
+					  surveyReports.errors.each{ println it  }
+				  }else{
+					  survey.surveyFlaggedCount=survey.surveyFlaggedCount+1
+					  if(survey.surveyFlaggedCount==10)
+					  {
+						  survey.status = "Autohidden"
+					  }
+					  if(!survey.save(flush:true)){
+						  survey.errors.each{ println it  }
+					  }else{
+					  }
+				  }
+			}
+			return surveyReports
+		}
+		catch(Exception e)
+		{
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	
+	def getSurveyReportBySurvey(surveyId,tokenValue)
+	{
+		Survey survey = getSurveyById(surveyId)
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user
+		def surveyReports = null
+		try
+		{
+			surveyReports = SurveyReports.findAllBySurvey(survey)
+			return surveyReports
+		}
+		catch(Exception e)
+		{
+			int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.errorCode
+			int status = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.status
+			String message = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.message
+			String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.surveyReports.moreInfo
+
+			throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+}
+

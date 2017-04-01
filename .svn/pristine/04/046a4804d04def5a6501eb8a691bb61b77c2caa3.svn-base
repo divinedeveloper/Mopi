@@ -1,0 +1,78 @@
+package com.mopi.api.timeline
+
+import java.util.Map;
+
+import org.json.JSONObject
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.user.Timeline
+import grails.converters.JSON
+
+import org.springframework.security.access.annotation.Secured;
+@Secured('permitAll')
+class TimelineController {
+
+	def timelineService
+	Map responseObject = [:]
+	def userService
+	
+    def index() { }
+	
+	/*def createTimeline()
+	{
+		try{
+			//all timeline are createed by only one createCommentSurveyTimeline (for- comment a survey,like a survey, follow a user)
+			//Timeline timeline=timelineService.createCommentSurveyTimeline(request,params.userId);
+			if(request.action == "Following")
+			{
+				timelineJsonlist=timelineService.createFollowingUserTimeline(request,params.userId);
+			}
+			else if(request.action == "Comment")
+			{
+				timelineJsonlist=timelineService.createCommentSurveyTimeline(request,params.userId);
+			}
+			else if(request.action == "Like")
+			{
+				timelineJsonlist=timelineService.createLikeSurveyTimeline(request,params.userId);
+			}
+			responseObject.error = false
+			responseObject.resp = timeline
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}*/
+	
+	def getFollowingUserTimeline()
+	{
+		try{
+			def timeline=timelineService.getFollowingUserTimeline(request);
+			responseObject.error = false
+			responseObject.resp = timeline
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	def getUserTimeline()
+	{
+		try{
+			def timeline=timelineService.getUserTimeline(request);
+			responseObject.error = false
+			responseObject.resp = timeline
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+}

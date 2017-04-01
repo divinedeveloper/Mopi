@@ -1,0 +1,276 @@
+package com.themopi.apis.searchactivity
+
+import com.themopi.exceptions.SurveyException
+import com.themopi.account.UserRole
+import grails.transaction.Transactional
+import com.themopi.survey.*
+import com.themopi.apis.*
+import com.themopi.exceptions.SurveyException
+import com.themopi.surveyactivity.*
+
+@Transactional
+class SurveySearchService {
+	static transactional = 'mongo'
+	def userService
+	def userSurveyService
+	def grailsApplication
+	/**
+	 * function to get survey search results along with count for that search
+	 * 
+	 * @param tokenValue
+	 * @param name
+	 * @param status
+	 * @param offset
+	 * @param limit
+	 * @return  map with search results and total count for search
+	 */
+	def search(tokenValue,name,status,offset,limit){
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		def user = userRole?.user
+		def survey = Survey.createCriteria()
+		def results = []
+		def surveyCount = 0
+		if(userRole?.role?.authority == "ROLE_SUPERADMIN" || userRole?.role?.authority == "ROLE_ADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){
+				}
+				surveyCount = Survey.count()
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){ eq('status',status) }
+				surveyCount = Survey.countByStatus(status)
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}else if(userRole?.role?.authority == "ROLE_SPONSEREDADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){ eq('user',user) }
+				def countList = survey.list(){ eq('user',user) }
+				surveyCount = countList.size();
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					eq('user',user)
+				}
+
+				def countList = survey.list(){
+					eq('status',status)
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}
+	}
+
+	
+	def appSearch(searchCategory,limit,offset){
+		List surveys = []
+		def count = 0
+		Calendar cal = Calendar.getInstance();
+		Date date = new Date();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		
+		println "begining of date method  == "+cal.getTime()
+		if(searchCategory == "explore"){
+			if(limit.toInteger()+offset.toInteger() <= 500){
+				def surveyCriteria = Survey.createCriteria()
+				surveys = surveyCriteria.list(max:limit,offset:offset){
+					eq('status','Active')
+					or{
+						lte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					order("lastUpdated", "desc")
+				}
+			//	surveys = Survey.findAllByStatusAnd("Active",[max: limit, sort: "lastUpdated", order: "desc", offset:offset])
+				def surveysList =  surveyCriteria.list(){
+					eq('status','Active')
+					or{
+						lte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					order("lastUpdated", "desc")
+				}
+				count = surveysList.size()
+				if(count >= 500){
+					count = 500
+				}
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() < 500){
+				limit = 500 - offset;
+				def surveyCriteria = Survey.createCriteria()
+				surveys = surveyCriteria.list(max:limit,offset:offset){
+					eq('status','Active')
+					or{
+						lte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					order("lastUpdated", "desc")
+				}
+				count = 500
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() >= 500){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.trendingOffset.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.trendingOffset.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.trendingOffset.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.trendingOffset.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.trendingOffset.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+
+			}
+		}else if(searchCategory == "trending"){
+		if(limit.toInteger()+offset.toInteger() <= 100){
+			Calendar calendarForStartTime = Calendar.getInstance()
+			calendarForStartTime.set(Calendar.HOUR_OF_DAY, 0);
+			calendarForStartTime.set(Calendar.MINUTE,0);
+			calendarForStartTime.set(Calendar.SECOND,0);
+			calendarForStartTime.add(Calendar.DATE, -6)
+			println "StartTime  === "+calendarForStartTime.getTime()
+			
+			def surveyCriteria = Survey.createCriteria()
+				surveys = surveyCriteria.list(max:limit,offset:offset){
+					
+					eq('status','Active')
+					or{
+						lte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					or{
+						gte('startTime',calendarForStartTime.getTime())
+						gte('dateCreated',calendarForStartTime.getTime())
+						eq('startTime',null)
+					}
+					//eq('visiblityCountry.name',"Pakistan")
+					order("responses", "desc")
+					order("lastUpdated", "desc")
+					
+					
+				}
+			//	surveys = Survey.findAllByStatusAnd("Active",[max: limit, sort: "lastUpdated", order: "desc", offset:offset])
+				def surveysList =  surveyCriteria.list(){
+					
+					eq('status','Active')
+					or{
+						lte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					or{
+						gte('startTime',calendarForStartTime.getTime())
+						gte('dateCreated',calendarForStartTime.getTime())
+						eq('startTime',null)
+					}
+					
+					order("responses", "desc")
+					order("lastUpdated", "desc")
+					
+				}
+				count = surveysList.size()
+				if(count >= 100){
+					count = 100
+				}
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() < 100){
+				limit = 100 - offset;
+				def surveyCriteria = Survey.createCriteria()
+				surveys = surveyCriteria.list(max:limit,offset:offset){
+					eq('status','Active')
+					or{
+						gte('endTime',cal.getTime())
+						eq('endTime',null)
+					}
+					or{
+						gte('startTime',calendarForStartTime.getTime())
+						gte('dateCreated',calendarForStartTime.getTime())
+						eq('startTime',null)
+					}
+					
+					order("responses", "desc")
+					order("lastUpdated", "desc")
+				}
+				count = 100
+				return [surveys:surveys,count:count]
+			}else if(offset.toInteger() >= 100){
+				int errorCode = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.errorCode
+				int status = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.status
+				String message = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.message
+				String extendedMessage = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.extendedMessage
+				String moreInfo = grailsApplication.config.customExceptions.survey.fourZeroZero.exploreOffset.moreInfo
+
+				throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)
+
+			}
+		}
+	}
+	def serviceMethod() {
+	}
+}

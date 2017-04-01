@@ -1,0 +1,132 @@
+package com.themopi.timeline.api
+
+import grails.converters.JSON
+import grails.transaction.Transactional
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.TimelineException
+import com.themopi.survey.Survey
+import com.themopi.user.Timeline
+
+@Transactional
+class TimelineService {
+
+	def userService
+	def surveyService
+    def serviceMethod() {}
+	
+	def createCommentSurveyTimeline(request,userId,surveyId)
+	{
+		try
+		{
+			println "----i m in createCommentSurveyTimeline------"
+			/*int errorCode = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.errorCode
+			println "errorCode--"+errorCode
+			int status = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.status
+			println "status--"+status
+			String message = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.message
+			println "message---"+message
+			String extendedMessage = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.extendedMessage
+			println "extendedMessage---"+extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.moreInfo
+			println "moreInfo----"+moreInfo*/
+			String tokenValue = request.getHeader('X-Auth-Token')
+			UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+			User user = userRole.user;
+			User tempUser = User.findById(userId);
+			
+			println "request.getJSON().type--"+request.getJSON().type
+			println "request.getJSON().action--"+request.getJSON().action
+			def timeline = new Timeline(
+				performedBy:user,
+				action:request.getJSON().action,
+				type:request.getJSON().type,
+				isActive:request.getJSON().isActive,
+				dateCreated:new Date(),
+				lastUpdated:new Date(),
+				user:tempUser
+				);
+			println "timeline----------"+timeline
+			println "su-----"+surveyId
+			println "user---"+tempUser
+			
+			/*def ujson = tempUser as JSON
+			def sjson = survey as JSON
+			def str = sjson as String
+			
+			println "ujson--"+ujson
+			println "sjson---"+sjson*/
+			if(surveyId==null || surveyId.equals(null) || surveyId.equals("null") || surveyId=="null")
+			{
+				println "save for performedOn user"
+				timeline['performedOn'] = new JSON(tempUser).toString();
+			}
+			else
+			{
+				println "save for performedOn survey"
+				Survey survey = surveyService.getSurveyById(surveyId)
+				println "survey---"+survey
+				timeline['performedOn'] = new JSON(survey).toString();
+			}
+			
+			//timeline['performedOn'] = 'ranjit';
+			if(!timeline.save())
+			{
+				println "not save"
+				return "Not Save"
+			}
+			else
+			{
+				println "---------save"+timeline
+				return timeline;
+			}
+		}
+		catch(TimelineException et)
+		{
+			return "Error occuring When saving"
+		}
+		catch(Exception e)
+		{
+			return "Error occuring When saving"
+		}
+	}
+	def createFollowingUserTimeline()
+	{
+		
+	}
+	def createLikeSurveyTimeline()
+	{
+		
+	}
+	def updateCommentSurveyTimeline()
+	{
+		
+	}
+	def updateFollowingUserTimeline()
+	{
+		
+	}
+	def updateLikeSurveyTimeline()
+	{
+		
+	}
+	def getUserTimeline(request)
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		Timeline obj = Timeline.findAll()
+	}
+	def getFollowingUserTimeline()
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+	}
+	def getLikeSurveyTimeline()
+	{
+		
+	}
+	
+}

@@ -1,0 +1,57 @@
+<div class="page page-table" data-ng-controller="SurveyCtrl">
+	<section class="panel panel-default table-dynamic">
+		<div class="panel-heading">
+			<strong><span class="ti-notepad" style="padding-right: 6px;"></span>Survey</strong>
+		</div>
+
+		<div class="table-filters">
+			<div class="row">
+				<div class="col-md-4  form-group">
+					<form>
+						<div class="input-group">
+							<input ng-model="searchparams" type="text" class="form-control"> <span
+								class="input-group-btn">
+								<button ng-click="surveyresuts.$params.page = 1;surveyresuts.reload()" type="button" class="btn btn-default">Go!</button>
+							</span>
+						</div>
+					</form>
+				</div>
+
+				<div class="col-md-2  form-group">
+					<select class="form-control" ng-change="surveyresuts.$params.page = 1;surveyresuts.reload()" data-placeholder="Status" chosen
+						disable-search="true" ng-model="status"
+						ng-options="stat.name as stat.name for stat in statusavailable">
+						<option value=""></option>
+					</select>
+				</div>
+				<div class="col-md-3  form-group" ng-if="authenticationfunction(['ROLE_SPONSEREDADMIN'])">
+					<button class="btn btn-success"
+						click-link="surveydetails/newsurvey">
+						<span class="ti-plus"></span> Create
+					</button>
+				</div>
+
+
+
+			</div>
+
+		</div>
+<div ng-show="surveyresuts.data.length==0"> <label style="padding-left: 20px;">No Surveys</label></div>
+<div class="table-responsive" ng-show="surveyresuts.length>0">
+<table ng-table="surveyresuts"
+	class="table  table-hover table-bordered">
+	<tr ng-repeat="user in $data" click-link="surveydetails/{{user.id}}">
+
+		<td data-title="" style="vertical-align: middle;">
+		<img class="img-rounded img64_64" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+" ng-src="{{user.imageUrl}}" alt=""><span
+			style="margin-left: 10px;">{{user.name}}</span></td>
+
+		<td data-title="" style="vertical-align: middle;">{{user.status}}</td>
+		<td data-title="" style="vertical-align: middle;">{{user.responses}}
+			Responses</td>
+		<td data-title="" style="vertical-align: middle;" ng-if="userdata.resp.id !=user.id">{{user.user.name}}</td>
+	</tr>
+</table>
+</div>
+</section>
+</div>

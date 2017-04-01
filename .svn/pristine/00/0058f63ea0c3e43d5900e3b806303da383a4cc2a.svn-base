@@ -1,0 +1,131 @@
+package com.themopi.image
+
+import com.amazonaws.services.s3.transfer.Upload
+import com.themopi.account.UserRole
+import com.themopi.exceptions.ImageUploadException
+import com.themopi.survey.Options
+import com.themopi.survey.Question;
+import com.themopi.survey.Survey
+
+import grails.transaction.Transactional
+
+@Transactional
+class QuestionimageService {
+	static transactional = 'mongo'
+	
+	def grailsApplication
+	def userService
+	def questionService
+	def surveyService
+	def s3UploadService
+     def uploadImage(request,imageUrl,questionId,surveyId) {
+		
+		int errorCode = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.errorCode
+		int status = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.status
+		String message = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.message
+		String extendedMessage = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.extendedMessage
+		String moreInfo = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.moreInfo
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		def question = Question.findById(questionId)
+		println "----question-----question----"+question
+		question.imageUrlQ=imageUrl
+	   if(!question.save()){
+			question.errors.each{
+				println it
+			}
+		}
+	   
+	   ///
+	   println "-----------------"
+	   println "surveyId--"+surveyId
+	   def questionList = []
+	   Question tquestion = null
+	   //Survey survey = Survey.findById(surveyId)
+	   Survey survey = surveyService.getSurveyById(surveyId)
+	   println "survey---"+survey
+	   survey.questions.each{
+		   println it.id
+		   if( it.id == questionId.toInteger()){
+			   tquestion = it
+			   println it
+		   }else{
+			   questionList.add(it)
+		   }
+	   }
+
+	   
+
+	   questionList.add(question)
+	  
+	   survey.questions = questionList
+	   if(!survey.save()){
+		   survey.errors.each{
+			   println it
+		   }
+	   }
+	   
+	   println survey.questions
+	   return question
+	   ////
+	   //return imageUrl
+    }
+	 
+	 
+	 def multipleChoiceImage(uploadedFile,surveyId,questionId,optionId){
+		 def imageUrl =  null 
+		 String pathname = grailsApplication.config.myapp.tempImageFolderPath.toString()
+		 String originalFileExtension = uploadedFile.originalFilename.substring(uploadedFile.originalFilename.lastIndexOf("."))
+		
+		 println pathname
+		 uploadedFile.transferTo(new File(pathname+originalFileExtension))
+		 pathname = pathname
+		 def date = new Date()
+		 String originalFileName =  date.getTime().toString()+uploadedFile.originalFilename.toString();
+		 println originalFileName
+		 Upload upload = s3UploadService.uploadFile(pathname,originalFileName)
+		 println "upload----"+upload
+		 def question = uploadImageForQuestionOption(surveyId,questionId,optionId,"https://s3-ap-southeast-1.amazonaws.com/mopi-tmp-media/"+originalFileName);
+		 return question
+	 }
+	 
+	 def uploadImageForQuestionOption(surveyId,questionId,optionId,imageUrl){
+		 def questionList = []
+		 println "originalFIleName  == ="+imageUrl
+		 Survey survey = surveyService.getSurveyById(surveyId)
+		 Question question 
+		 survey.questions.each{
+			 println it.id
+			 if( it.id == questionId.toInteger()){
+				 question = it
+				 println it
+			 }else{
+				 questionList.add(it)
+			 }
+		 }
+		 def opts = []
+		 question.options.each{
+			 println "it ====== "+it.id.getClass()
+			 if(optionId.toInteger() != it?.id){
+			 	 opts.add(it)
+			 }else{
+			 Options opt = it
+			 it.image = imageUrl 
+			 opts.add(opt)
+			 }
+		 }
+		 
+		 question.options = opts
+		 question.save()
+		 questionList.add(question)
+		 survey.questions = questionList
+		 if(!survey.save()){
+			survey.errors.each{
+				println it
+			}
+		}
+		
+		return question
+		 
+	 }
+}

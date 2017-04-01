@@ -1,0 +1,79 @@
+package com.mopi.api.timeline
+
+import java.util.Map;
+
+import org.json.JSONObject
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.user.Timeline
+import grails.converters.JSON
+
+import org.springframework.security.access.annotation.Secured;
+@Secured('permitAll')
+class TimelineController {
+
+	def timelineService
+	Map responseObject = [:]
+	def userService
+	def beforeInterceptor = [action: this.&auth, except: 'login']
+	private auth() {
+		
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user=userRole.user
+		if(user.isActive==false)
+		{
+			redirect(action: 'login')
+			return false
+		}
+	}
+	
+	def login() {
+		// display login page
+		redirect(uri: grailsApplication.config.myapp.baseUrl+"/#/login")
+	}
+    def index() { }
+	
+	def createTimeline()
+	{
+		try{
+			Timeline timeline=timelineService.createCommentSurveyTimeline(request,params.userId);
+			/*if(request.action == "Following")
+			{
+				timelineJsonlist=timelineService.createFollowingUserTimeline(request,params.userId);
+			}
+			else if(request.action == "Comment")
+			{
+				timelineJsonlist=timelineService.createCommentSurveyTimeline(request,params.userId);
+			}
+			else if(request.action == "Like")
+			{
+				timelineJsonlist=timelineService.createLikeSurveyTimeline(request,params.userId);
+			}*/
+			responseObject.error = false
+			responseObject.resp = timeline
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			/*log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()*/
+		}
+	}
+	
+	def getTimeline()
+	{
+		try{
+			JSONObject timelineJsonlist=timelineService.createFollowingUserTimeline(request,params.userId);
+			responseObject.error = false
+			responseObject.resp = timelineJsonlist.map
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+}

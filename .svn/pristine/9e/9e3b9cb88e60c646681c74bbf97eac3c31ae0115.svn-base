@@ -1,0 +1,268 @@
+//(function() {
+//  'use strict';
+
+app.controller('DashboardCtrl', ['$scope','Restangular','$filter','constantvalue','$rootScope',function($scope,Restangular,$filter,constantvalue,$rootScope) {
+
+
+	$scope.breadCrumb.hideBreadCrumb = false
+
+	$rootScope.breadcrum=[{"name":"Home","url":"dashboard"}/*,
+    {"name":"Dashboard","url":"dashboard"},
+    {"name":"temp","url":"user"}*/]
+
+    	/*World Map Function starts*/
+	 $scope.mapdata=[]
+
+	  Restangular.one("dashboard/map").get().then(function (data) {
+		 var male={}
+		 var female={}
+		 var unknown={}
+		 var results=[]
+		  console.log(data)
+		  // angular.forEach(data.resp, function(value, key) {
+
+		  for(var i=0;i<data.resp.length;i++){
+			  male[data.resp[i].code.toString()] = data.resp[i].male
+			  female[data.resp[i].code.toString()]=data.resp[i].female
+			  unknown[data.resp[i].code.toString()]=data.resp[i].unknown
+		  }
+		 results.push({"d":[{"Male":male},
+                       {"Female":female},
+                       {"Unknown":unknown}]})
+		  // })
+		 $scope.mapdata={"results":results}
+		     console.log($scope.mapdata)
+
+	  });
+
+     chkValue($scope.mapdata)
+
+    function chkValue(val){
+  	  var x
+  	    if (typeof val ==="undefined"){
+  	      x = 0;
+  	    }
+  	    else {
+  	      x = val;
+  	    }
+  	    return x;
+  	};
+
+ $scope.worldMap = {
+      map: 'world_mill_en',
+
+      values:$scope.mapdata.results,
+      normalizeFunction: 'polynomial',
+      backgroundColor: null,
+      zoomOnScroll: false,
+      regionStyle: {
+        initial: {
+          fill: '#EEEFF3'
+        },
+        hover: {
+          fill: $scope.color.primary
+        }
+      },
+      markerStyle: {
+        initial: {
+          fill: '#BF616A',
+          stroke: 'rgba(191,97,106,.8)',
+          "fill-opacity": 1,
+          "stroke-width": 9,
+          "stroke-opacity": 0.5
+        },
+        hover: {
+          stroke: 'black',
+          "stroke-width": 2
+        }
+      },
+//      onRegionLabelShow: function(event, label, code){
+//          label.html(label.html() +' (' + code.toString() +
+//         ') <br>Male: ' + chkValue($scope.mapdata.results[0].d[0].Male[code] )+ '<br>Female:'+ chkValue($scope.mapdata.results[1].d[1].Female[code])+ '<br>Others:'+ chkValue($scope.mapdata.results[2].d[2].others[code]) );
+//
+//      	}
+      onRegionLabelShow : function(event, label, code) {
+          for (var i = 0; i < chkValue($scope.mapdata.results.length); i++) {
+            label.html(label.html()
+                + ' ('
+                + code.toString()
+                + ') <br>Male: '
+                + chkValue($scope.mapdata.results[i].d[0].Male[code])
+                + '<br>Female:'
+                + chkValue($scope.mapdata.results[i].d[1].Female[code])
+                + '<br>Unknown:'
+                + chkValue($scope.mapdata.results[i].d[2].Unknown[code]));
+
+          }
+         }
+    };
+    /*World Map Function ends*/
+
+
+
+
+      var marker_data;
+      /*Pie Charts function starts[Country/Points/Religion]*/
+
+      $scope.pieChart={}
+
+		Restangular.one("dashboard").get().then(function (data) {
+$scope.usersaccount=data.resp
+		  })
+
+
+		  $scope.piechart=function(type){
+    	  $scope[type]={}
+    	  $scope[type].data=[]
+    	  Restangular.one("dashboard/graph").get({"type":type}).then(function (data) {
+
+
+    	  angular.forEach(data.result,function(value){
+    		  if(value._id!=null){
+    		  $scope[type].data.push( {
+                  label: value._id.toString(),
+                  data: value.count
+                })
+    		  }
+
+    	  })
+
+
+    	  })
+
+
+    	  }
+
+
+      $scope.pieChart.options = {
+        series: {
+          pie: {
+            show: true
+          }
+        },
+        legend: {
+          show: true
+        },
+        grid: {
+         hoverable: true,
+          clickable: true
+        },
+        colors: [$scope.color.primary, $scope.color.success, $scope.color.info, $scope.color.warning, $scope.color.danger],
+        tooltip: true,
+       tooltipOpts: {
+          content: "%p.0%, %s",
+          defaultTheme: false
+        }
+      };
+
+
+      /*Bar Chart function starts[Age/Sex/Occupation/Income]*/
+
+
+
+		$scope.graphconstant={};
+		$scope.graphconstant.age= constantvalue.age
+		$scope.graphconstant.income=constantvalue.income
+		$scope.graphconstant.gender= constantvalue.gender
+		//$scope.graphconstant.occupation=  constantvalue.occupation
+		console.log($scope.graphconstant)
+		console.log("asd")
+
+		$scope.formatteddata=function(clientdata,serverdata){
+
+
+	        var tempformated=[]
+	    	angular.forEach(clientdata,function(value){
+
+	    		var filtereddata=$filter("filter")(serverdata,value._id)
+
+	    			tempformated.push([value._id,filtereddata.length>0?filtereddata[0].count:0])
+
+			})
+
+			return tempformated
+	     }
+		  $scope.barchartoptions = {
+		        series: {
+		          stack: true,
+		          bars: {
+		            show: true,
+		            fill: 1,
+		            barWidth: 0.2,
+		            align: "center",
+		            horizontal: false
+		          }
+		        },
+		      xaxis: {
+				mode: "categories",
+				tickLength: 0,
+				rotateTicks: 140
+			},
+			yaxis:{
+				tickDecimals:0
+			},
+		        grid: {
+		          hoverable: true,
+		          borderWidth: 1,
+		          borderColor: "#eeeeee"
+		        },
+		        tooltip: true,
+		        tooltipOpts: {
+		          defaultTheme: false
+		        },
+		        colors: [$scope.color.success, $scope.color.info, $scope.color.warning, $scope.color.danger]
+		      };
+
+
+
+
+
+
+
+
+
+
+$scope.chart=function(type){
+Restangular.one("dashboard/graph").get({"type":type}).then(function (data) {
+$scope[type]= {};
+console.log($scope.graphconstant[type])
+$scope[type].data1=$scope.formatteddata($scope.graphconstant[type],data.result)
+
+
+
+$scope[type].data = [
+{
+label: type,
+data: $scope[type].data1,
+bars: {
+order: 0
+}
+}
+];
+})
+
+
+}
+$scope.chart("income")
+$scope.chart("age")
+ $scope.chart("gender")
+  $scope.piechart("occupation")
+   $scope.piechart("country")
+    $scope.piechart("points")
+     $scope.piechart("religion")
+
+
+
+      /*Bar Chart function  ends*/
+
+
+
+
+
+
+    }
+  ]);
+
+//}).call(this);
+
+//# sourceMappingURL=Map.js.map

@@ -1,0 +1,9 @@
+<div ng-controller="CommentQuestionCtrl">
+<p>This is  question to add comment</p>
+	<div class="row text-center">
+		<div class="form-group">
+			<button class="btn btn-w-md btn-gap-v btn-success"
+				ng-click="saveQuestion()" type="button">Save</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,78 @@
+package com.themopi.apis.security
+
+
+import org.json.JSONArray
+import org.json.JSONObject
+import org.springframework.web.context.request.RequestContextHolder
+import com.mongodb.util.JSONParser
+import com.themopi.apis.GiftController
+import com.themopi.apis.SurveyController
+import com.themopi.utils.CurrentIDs
+import com.themopi.utils.GenerateDataUtils
+import grails.converters.JSON
+import spock.lang.*
+import grails.converters.*
+/**
+ *
+ */
+
+class GetId{
+	int surveyId
+  }
+class CreateGiftControllerSpec extends Specification {
+
+	//get auth token to send in request header
+	/**
+	 * here authToken hard coded
+	 * further we put auth token from calling auth token
+	 */
+	/*@Shared surveyId*/
+	GetId currentIDsObj = new GetId();
+	def surveyIdD
+    def setup() {
+		String accessToken = "d34l1gfteuenjmapg2m9d5qu4kvn3hq7"
+		
+		
+    }
+
+    def cleanup() {
+		currentIDsObj=null;
+    }
+
+	/*void "test valid gift"()
+	{
+		def grailsApplication
+		
+		given: "login controller"
+			
+			println "surveyId----"
+			GenerateDataUtils gDatautils = new GenerateDataUtils();
+			String giftCode = gDatautils.generateGiftCode()
+			String giftText = gDatautils.generateGiftName()
+			int maxNo = gDatautils.generateGiftMaxNo
+			GiftController giftController = new GiftController()
+			giftController.request.addHeader("contentType","application/json")
+			giftController.request.addHeader("X-Auth-Token","d34l1gfteuenjmapg2m9d5qu4kvn3hq7")
+			giftController.request.setMethod("POST");
+			giftController.request.content = '''{"code":'''+giftCode+''',
+												 "text":'''+giftText+''',
+												 "maxNo":'''+maxNo+'''
+												}'''
+		when: "addGift action is invoked"
+			def json = JSON.parse(new FileInputStream("C://Users//PREMPRAKASH//Desktop//tempTextFile//survey.json"), "UTF-8")
+			println "json.content.surveyId----"+json.content.surveyId
+			String surveyIdString=json.content.surveyId;
+			int surveyId=Integer.parseInt(surveyIdString);
+			giftController.params.surveyId=surveyId
+			giftController.params.giftId=0
+			giftController.addGift()
+			println "gift created-------------"
+		then: "testing success response from gift controller"
+			def result = giftController.response.json
+			println "gift checked create or not --"+result
+			assert giftController.response.json.error == false
+			assert giftController.response.json.resp.code == giftCode
+			assert giftController.response.json.resp.text == giftText
+			assert giftController.response.json.resp.maxNo == maxNo
+	}*/
+}

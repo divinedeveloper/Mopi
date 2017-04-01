@@ -1,0 +1,24 @@
+<div class="page" ng-controller="CommentsCtrl">
+	<section class="panel panel-default ">
+
+		<div class="panel-heading">
+			<strong><i class="ti-user"></i>Comments People Flagged On : {{survey.name}}</strong> 
+		</div>
+		<div class="panel-body">
+		<div ng-show="comments.data.length==0"> <label style="padding-left: 20px;">No Comments</label></div>
+		<div class="table-responsive" ng-show="comments.data.length>0">
+		<table ng-table="comments" class="table table-responsive table-hover table-bordered table-striped">
+	<tr ng-repeat="com in $data">
+
+		<td data-title="'Comments'" style="vertical-align: middle;">{{com.comment}}</td>
+		<td data-title="'Status'" style="vertical-align: middle;" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN'])"><span ng-if="com.commentReportCount>0" style="color:red">Flagged</span></td>
+		<td data-title="'Hide'" style="vertical-align: middle;" ng-show="authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN'])"><span ng-click="flagSurvey(com.id);comments.reload()" class="ti-close"></span></td>
+
+	</tr>
+</table>
+</div>
+		
+		</div>
+	</section>
+	
+	</div>

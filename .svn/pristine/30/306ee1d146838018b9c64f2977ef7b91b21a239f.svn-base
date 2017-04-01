@@ -1,0 +1,42 @@
+package com.themopi.apis.security
+
+import grails.transaction.Transactional
+
+
+import com.themopi.account.AuthenticationToken;
+import com.themopi.exceptions.SecurityException;
+
+
+/**
+ * @author Abhimanyu
+ * This class contain function necessary to execute logout functionality
+ */
+@Transactional
+class LogoutService {
+	def grailsApplication
+
+
+	/*
+	 *  removeToken function accepts the X-Auth-Token , find the the entry in AuthenticationToken domain using X-Auth-token
+	 *  against authToken and delete the Entry. If Entry doesn't exist it sends error 4004  and httpstatus code 404 
+	 */
+	def removeToken(tokenValue){
+		log.debug(tokenValue)
+		def errorCode =  grailsApplication.config.customExceptions.security.fourZeroFour.logout.errorCode
+		def message =  grailsApplication.config.customExceptions.security.fourZeroFour.logout.message
+		def extendedMessage =  grailsApplication.config.customExceptions.security.fourZeroFour.logout.extendedMessage
+		def moreInfo =  grailsApplication.config.customExceptions.security.fourZeroFour.logout.moreInfo
+		log.debug("errorCode="+errorCode+"  message="+message)
+		AuthenticationToken authToken = AuthenticationToken.findByAuthToken(tokenValue); //find AUthenticationDomain entry against the authorization token 
+		if(authToken == null){
+			throw new SecurityException(404,4004,message,extendedMessage,moreInfo)
+		}else{
+			authToken.delete(flush:true)
+		}
+	}
+	
+	
+	def serviceMethod() {
+
+	}
+}

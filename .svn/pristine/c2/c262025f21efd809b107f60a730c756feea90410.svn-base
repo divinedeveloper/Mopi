@@ -1,0 +1,21 @@
+<div ng-controller="CommentQuestionCtrl">
+<div class="col-md-10 center-block" style="float:none">
+<div class="row">
+			<div class="col-md-2" ng-file-select="onFileSelect($files)">
+				<img  class="img-thumbnail" id="giftimage"
+					alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+"
+				ng-src="{{questiondetails.imageUrlQ}}"	style="width: 140px; height: 140px;">
+			</div>
+			<div class="col-md-3">
+			<p>This is  question to add comment</p>
+			</div>
+			</div>
+			</div>
+
+	<div class="row text-center">
+		<div class="form-group">
+			<button class="btn btn-w-md btn-gap-v btn-success"
+				ng-click="saveQuestion()" type="button">Save</button>
+		</div>
+	</div>
+</div>

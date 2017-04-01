@@ -1,0 +1,20 @@
+package com.themopi.mail
+
+import grails.plugin.asyncmail.AsynchronousMailService;
+import grails.transaction.Transactional
+
+@Transactional
+class SendMailService {
+    AsynchronousMailService asynchronousMailService
+	def mail(fromEmail,email,fromSubject,htmlBody){
+		asynchronousMailService.sendMail {
+			from fromEmail
+			to email
+			subject fromSubject;
+			html htmlBody;
+			}
+	}
+    def serviceMethod() {
+
+    }
+}

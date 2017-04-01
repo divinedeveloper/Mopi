@@ -1,0 +1,136 @@
+package com.themopi.apis.searchactivity
+
+import com.themopi.account.UserRole
+import grails.transaction.Transactional
+import com.themopi.survey.*
+import com.themopi.apis.*
+import com.themopi.surveyactivity.*
+
+@Transactional
+class SurveySearchService {
+	static transactional = 'mongo'
+	def userService
+	def userSurveyService
+	/**
+	 * function to get survey search results along with count for that search
+	 * 
+	 * @param tokenValue
+	 * @param name
+	 * @param status
+	 * @param offset
+	 * @param limit
+	 * @return  map with search results and total count for search
+	 */
+	def search(tokenValue,name,status,offset,limit){
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		def user = userRole?.user
+		def survey = Survey.createCriteria()
+		def results = []
+		def surveyCount = 0
+		if(userRole?.role?.authority == "ROLE_SUPERADMIN" || userRole?.role?.authority == "ROLE_ADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){
+				}
+				surveyCount = Survey.count()
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){ eq('status',status) }
+				surveyCount = Survey.countByStatus(status)
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}else if(userRole?.role?.authority == "ROLE_SPONSEREDADMIN"){
+			if(status == "" && name == ""){
+				results = survey.list(max:limit,offset:offset){ eq('user',user) }
+				def countList = survey.list(){ eq('user',user) }
+				surveyCount = countList.size();
+			}else if(name == "" && status != ""){
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					eq('user',user)
+				}
+
+				def countList = survey.list(){
+					eq('status',status)
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else if(status == "" && name != ""){
+				results = survey.list(max:limit,offset:offset){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(){
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}else{
+				results = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				def countList = survey.list(max:limit,offset:offset){
+					eq('status',status)
+					or{
+						ilike("name","%"+name+"%")
+						ilike("surveyCode","%"+name+"%")
+					}
+					eq('user',user)
+				}
+				surveyCount = countList.size()
+			}
+			Map result = [results:results,count:surveyCount]
+			return result
+		}
+	}
+
+	
+	def appSearch(searchCategory,limit,offset){
+		if(searchCategory == "explore"){
+			List surveys = Survey.findAllByStatus("Active",[max: limit, sort: "lastUpdated", order: "desc", offset:offset])
+			return surveys
+		}
+	}
+	def serviceMethod() {
+	}
+}

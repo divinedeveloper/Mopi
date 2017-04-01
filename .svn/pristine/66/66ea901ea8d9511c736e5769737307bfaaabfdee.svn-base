@@ -1,0 +1,34 @@
+.app .pac-container {
+	z-index:999999;
+}
+.validation-valid {
+    color: #0074D9;
+}
+
+
+.validation-invalid {
+    color: #FF4136;
+}
+.no-padding{
+	padding:0
+}
+select {
+   -moz-appearance: window; 
+   -moz-background-position: -9999px -9999px!important;
+    text-indent: 0.01px;
+    text-overflow: '';
+}
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+.chosen-container{
+	width:100% !important;
+}

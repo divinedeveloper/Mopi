@@ -1,0 +1,46 @@
+<div class="page surveyform" ng-controller="SurveyformCtrl">
+	<div class="row">
+		<div class="col-md-3">
+			<div class="widget-container">
+				<section class="panel panel-default">
+					<div class="panel-heading">
+						<strong><span class="glyphicon glyphicon-th"></span>
+							Blank Page</strong>
+					</div>
+					<div class="panel-body">
+						<ul>
+							<li>Binary questions</li>
+							<li>Binary questions</li>
+							<li>Binary questions</li>
+						</ul>
+
+					</div>
+				</section>
+			</div>
+		</div>
+		<div class="col-md-9">
+			<div class="widget-container">
+				<section class="panel panel-default">
+					<div class="panel-heading">
+						<strong><span class="glyphicon glyphicon-th"></span>
+							Blank Page</strong>
+					</div>
+					<div class="panel-body">
+						<div class="questions clearfix">
+							<div class="question-row clearfix">
+								<div class="questionset-container">
+					
+								<div ng-repeat="data in formdata" ng-include="data.template"></div>
+					
+
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+</div>
+

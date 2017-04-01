@@ -1,0 +1,28 @@
+<div ng-controller="MCQquestionCtrl">
+
+<button class="btn btn-w-md btn-gap-v btn-success" ng-click="mcqquestion=data;editmode=false" data-template="static/partials/modaltemplates/modaladdmultiplechoice.html" bs-modal="modal" type="button">Add</button>
+	<div class="row">
+		<div class="col-md-4" ng-repeat="data in options"  ng-click="mcqquestion=data;editmode=true;index=$index" data-template="static/partials/modaltemplates/modaladdmultiplechoice.html" bs-modal="modal">
+			<ul class="media-list">
+				<li class="media" >
+				<a class="pull-left" href="" > 
+				<img class="media-object" alt="64x64" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+"
+					ng-src=""	style="width: 64px; height: 64px;">
+				</a>
+					<div class="media-body" style="padding-top: 18px;">
+						<h4 class="media-heading">{{data}}</h4>
+					</div></li>
+			</ul>
+		</div>
+
+
+
+	</div>
+			<div class="row text-center">
+		<div class="form-group">
+	<button class="btn btn-w-md btn-gap-v btn-success"
+		ng-click="saveQuestion()" type="button">Save</button>
+		</div>
+		</div>
+
+</div>

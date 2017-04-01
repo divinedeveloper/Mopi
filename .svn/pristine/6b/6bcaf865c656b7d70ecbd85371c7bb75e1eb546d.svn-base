@@ -1,0 +1,58 @@
+<div class="page-signin" ng-controller="ResetpwdCtrl">
+
+    <div class="signin-header">
+        <section class="logo text-center">
+            <h1><a href="">{{main.brand}}</a></h1>
+        </section>
+    </div>
+
+    <div class="signin-body">
+        <div class="container">
+            <div class="form-container">
+
+                <form class="form-horizontal" name="loginform">
+                    <fieldset>
+             
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <span class="ti-lock"></span>
+                                </span>
+                                <input type="password"
+                                       class="form-control input-lg"
+                                       placeholder="Password"  ng-model="reset.newPassword" name="requireWatch" validator="required" valid-method="submit-only" required-error-message="Please fill this field">
+                            </div>
+                        </div>
+                           <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <span class="ti-lock"></span>
+                                </span>
+                                <input type="password"
+                                       class="form-control input-lg"
+                                       placeholder="Confirm Password" ng-model="reset.newPassword2" name="requireWatch" validator="required" valid-method="submit-only" required-error-message="Please fill this field">
+                            </div>
+                        </div>
+                        <span class="validation-invalid">{{errorstatus}}</span>
+
+                        <div class="divider divider-xl"></div>
+                        <div class="form-group">
+                            <a href="" class="btn btn-primary btn-lg btn-block text-center" ng-click="resetpassword(reset)">Submit</a>
+                        </div>
+                    </fieldset>
+                </form>
+
+                <div class="divider"></div>
+<!--                 <section class="additional-info"> -->
+<!--                     <p class="text-right"> -->
+<!--                         <a href="#/forgetpassword">Forgot your password?</a> -->
+<!--                         <span> | </span> -->
+<!--                         <a href="#/pages/signup">Sign up</a> -->
+<!--                     </p> -->
+<!--                 </section> -->
+                
+            </div>
+        </div>
+    </div>
+
+</div>

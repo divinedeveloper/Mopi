@@ -1,0 +1,62 @@
+package com.themopi.usermanagement
+
+class User {
+
+	transient springSecurityService
+
+	String username,firstName,lastName,authToken,gPlusAuthToken,gPlusRefreshToken,tokenValue
+	String password,fbUID
+	String email
+	
+	
+	boolean fbLogin,gPlusLogin,isActive
+	boolean enabled = true
+	boolean accountExpired
+	boolean accountLocked
+	boolean passwordExpired
+	
+	Date lastUpdated
+	Date dateCreated
+	Date deletedAt
+
+	static transients = ['springSecurityService']
+
+	static constraints = {
+		username blank: false, unique: true
+		password blank: false
+		firstName blank:false
+		lastName  blank:false
+		authToken nullable:true
+		gPlusAuthToken nullable:true
+		gPlusRefreshToken nullable:true
+		fbUID	nullable:true
+		email	blank:false ,email:true , unique: true
+		deletedAt nullable:true
+		fbLogin nullable:true
+		gPlusLogin nullable:true
+		tokenValue nullable:true
+		
+	}
+
+	static mapping = {
+		password column: '`password`'
+	}
+
+	Set<Role> getAuthorities() {
+		UserRole.findAllByUser(this).collect { it.role }
+	}
+
+	/*def beforeInsert() {
+		encodePassword()
+	}*/
+
+/*	def beforeUpdate() {
+		if (isDirty('password')) {
+			encodePassword()
+		}
+	}*/
+
+	/*protected void encodePassword() {
+		password = springSecurityService?.passwordEncoder ? springSecurityService.encodePassword(password) : password
+	}*/
+}

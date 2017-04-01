@@ -1,0 +1,56 @@
+package com.themopi.apis.security
+
+
+
+import spock.lang.*
+
+/**
+ *
+ */
+class LoginControllerIntegrationSpec extends Specification {
+
+	String randomValue
+    def setup() {
+    }
+
+    def cleanup() {
+    }
+
+	void "test valid signup data"() {
+		
+	}
+	
+	/**
+	 * 
+	 */
+    void "test login"() {
+		
+		String email
+		RegistrationControllerIntegrationSpec registrationController = new RegistrationControllerIntegrationSpec()
+		
+		given: "Invoke Login controller and setting request headers"
+			
+			String randomValue
+			randomValue=registrationController.randomValue
+	
+		when: "signup action is invoked"
+		def result = registrationController.signUp()
+		
+		then: "testing success response from controller"
+		//result = registrationController.response.json
+		println "result is "+result
+		assert registrationController.response.status == 200
+		assert registrationController.response.json.error == false
+		assert registrationController.response.json.resp.email ==email
+		assert registrationController.response.json.resp.roleId == roleId
+		assert registrationController.response.json.resp.name == uname
+		assert registrationController.response.json.resp.username == uname
+		
+		and: "login controller"
+		
+		/*registrationController.request.content = '''{"email":'''+email+''',
+												 "password":'''+pass+'''
+												}'''
+		*/
+    }
+}

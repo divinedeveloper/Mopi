@@ -1,0 +1,51 @@
+app.controller(
+					'CommentsCtrl',
+					[
+							'$scope',
+							'$filter',
+							'ngTableParams','$modal','Restangular','configsetting','$routeParams','Notification','$rootScope','toaster',
+							function($scope, $filter, ngTableParams,$modal,Restangular,configsetting,$routeParams,Notification,$rootScope,toaster) {
+								$scope.urlpath={}
+								
+                     			$rootScope.breadcrum=[{"name":"Survey","url":"survey"},
+    							                      {"name":"SurveyDetails","url":"surveydetails/"+$routeParams.surveyid},
+    							                      {"name":"CommentsFlagged","url":"comments/"+$routeParams.surveyid}]
+								
+								$scope.urlpath.surveydetails=$scope.environment=="Development"?"surveys/"+$routeParams.surveyid:$scope.staticjsonpath+"/surveydetails.json";
+								  Restangular.one($scope.urlpath.surveydetails).get().then(function (data) {
+						
+									  $scope.survey=data.resp
+								  })
+								
+								
+								$scope.comments = new ngTableParams({
+									page : 1, // show first page
+									count : 10
+								// count per page
+								}, {
+									total : 0, // length of data
+									getData : function($defer, params) {
+									
+								$scope.urlpath.comments=$scope.environment=="Development"?"surveys/"+$routeParams.surveyid+"/comments":$scope.staticjsonpath+"/comments.json";
+										  Restangular.one($scope.urlpath.comments).get({"offset":(params.$params.page-1)*params.$params.count,"limit":params.$params.count,"flag":$rootScope.userdata.role.id==3?false:true}).then(function (data) {
+											  params.total(data.resp.count)
+												$defer.resolve(data.resp.comments);
+										  })
+									
+									}
+								});
+								
+							$scope.flagSurvey=function(id){
+								
+								
+								Restangular.all("surveys/"+$routeParams.surveyid+"/comments?activity=hide").customPUT({"flaggedCommentId": id}).then(
+										function(data) {
+											toaster.pop('success', "Comment hidden successfuly");
+											$scope.comments.reload()
+										},function(data){
+											toaster.pop('error', data.message);
+											
+										});	
+							}	
+								
+							}])

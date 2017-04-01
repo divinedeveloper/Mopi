@@ -1,0 +1,138 @@
+package com.themopi.timeline.api
+
+import java.awt.List;
+
+import org.springframework.data.mongodb.core.query.Update.Each;
+
+import grails.converters.JSON
+import grails.transaction.Transactional
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.TimelineException
+import com.themopi.survey.Survey
+import com.themopi.user.Followers
+import com.themopi.user.Timeline
+
+@Transactional
+class TimelineService {
+
+	def userService
+	def surveyService
+    def serviceMethod() {}
+	
+	def createCommentSurveyTimeline(request,userId,surveyId)
+	{
+		try
+		{
+			/*int errorCode = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.errorCode
+			int status = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.status
+			String message = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.message
+			String extendedMessage = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.moreInfo
+			*/
+			String tokenValue = request.getHeader('X-Auth-Token')
+			UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+			User user = userRole.user;
+			User tempUser = User.findById(userId);
+			
+			def timeline = new Timeline(
+				performedBy:user,
+				action:request.getJSON().action,
+				type:request.getJSON().type,
+				isActive:request.getJSON().isActive,
+				dateCreated:new Date(),
+				lastUpdated:new Date(),
+				user:tempUser
+				);
+			
+			if(surveyId==null || surveyId.equals(null) || surveyId.equals("null") || surveyId=="null")
+			{
+				timeline['performedOn'] = new JSON(tempUser).toString();
+			}
+			else
+			{
+				Survey survey = surveyService.getSurveyById(surveyId)
+				timeline['performedOn'] = new JSON(survey).toString();
+			}
+			
+			if(!timeline.save())
+			{
+				return "Not Save"
+			}
+			else
+			{
+				return timeline;
+			}
+		}
+		catch(TimelineException et)
+		{
+			return "Error occuring When saving"
+		}
+		catch(Exception e)
+		{
+			return "Error occuring When saving"
+		}
+	}
+	def createFollowingUserTimeline()
+	{
+		
+	}
+	def createLikeSurveyTimeline()
+	{
+		
+	}
+	def updateCommentSurveyTimeline()
+	{
+		
+	}
+	def updateFollowingUserTimeline()
+	{
+		
+	}
+	def updateLikeSurveyTimeline()
+	{
+		
+	}
+	def getFollowingUserTimeline(request)
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		def followee=Followers.findAllByFollower(user)
+		ArrayList<Timeline> obj = new ArrayList<Timeline>();
+		for(int i=0;i<followee.size();i++)
+		{
+			def l=Timeline.findAllByPerformedBy(followee[i].followee)
+			for(int j=0;j<l.size();j++)
+			{
+				obj.add(l[j])
+			}
+			
+		}
+		return obj 
+	}
+	def getUserTimeline(request)
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		def followers=Followers.findAllByFollowee(user)
+		ArrayList<Timeline> obj = new ArrayList<Timeline>();
+		for(int i=0;i<followers.size();i++)
+		{
+			
+			def l=Timeline.findAllByPerformedBy(followers[i].followers)
+			for(int j=0;j<l.size();j++)
+			{
+				obj.add(l[j])
+			}
+		}
+		return obj 
+	}
+	def getLikeSurveyTimeline()
+	{
+		
+	}
+	
+}

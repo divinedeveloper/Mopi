@@ -1,0 +1,104 @@
+package com.themopi.apis.security
+
+import grails.plugin.springsecurity.*
+import grails.test.mixin.*
+import spock.lang.Specification
+
+import com.themopi.account.User
+import com.themopi.utils.GenerateDataUtils
+
+/**
+ * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
+ */
+@TestFor(RegistrationController)
+@Mock([com.themopi.account.UserService, com.themopi.account.User, com.themopi.account.Role,com.themopi.account.UserRole, com.themopi.account.RegistrationToken, com.themopi.user.Profile, com.themopi.user.Address, com.themopi.user.UserDistribution,SpringSecurityService])
+class RegistrationControllerSpec extends Specification {
+
+	
+	def setup() {
+		println "first setup"
+//		SpringSecurityService springSecurityServiceMock = Mock()
+		
+//		controller.springSecurityService = springSecurityServiceMock
+    }
+
+    def cleanup() {
+		println "first cleanup"
+    }
+
+	/**
+	 * testing for valid signup jsonpayload
+	 */
+ 	void "test signUp action for valid signup data"(){
+		given:"gennerate random values for email, name and username and password"
+		def stringValue = new GenerateDataUtils().randomString()
+		def emailValue = new GenerateDataUtils().generateRandomEmail()
+				
+		and: "mock user service and pass arguments to addUser method"
+		def mockUserService = mockFor(com.themopi.account.UserService)
+		mockUserService.demand.addUser{ a, b -> return new User(email: emailValue, name: stringValue, username: stringValue, roleId: 4, isActive: true)}
+		controller.userService = mockUserService.createMock()
+		
+		and: "set request headers and json payload"
+		request.contentType = 'application/json'
+		request['X-Auth-Token'] = null
+		request.json = '''{"email":'''+emailValue+''',
+						"password":'''+stringValue+''', 
+						"password2":'''+stringValue+''',
+						"roleId":'''+4+''', 
+						"name":'''+stringValue+''',
+						"username":'''+stringValue+
+						'''}'''
+						
+		when:"signup action is invoked"
+		controller.signUp()
+		
+		then:
+		def result = controller.response.json
+		assert result.error == false
+		assert result.resp.email == emailValue
+		assert result.resp.name == stringValue
+		assert result.resp.username == stringValue
+		assert result.resp.roleId == 4
+		assert result.resp.isActive == true
+		assert controller.response.status == 200
+	}
+	 
+	 /**
+	  * testing for invalid signup jsonpayload
+	  */
+	  void "test signUp action for invalid signup data"(){
+		 given:"gennerate random values for email, name and username and password"
+		 def stringValue = new GenerateDataUtils().randomString()
+		 def emailValue = new GenerateDataUtils().generateRandomEmail()
+				 
+		 and: "mock user service and pass arguments to addUser method"
+		 def mockUserService = mockFor(com.themopi.account.UserService)
+		 mockUserService.demand.addUser{ a, b -> throw new com.themopi.exceptions.AccountException(404,4004,message,extendedMessage,moreInfo)}
+		 controller.userService = mockUserService.createMock()
+		 
+		 and: "set request headers and json payload"
+		 request.contentType = 'application/json'
+		 request['X-Auth-Token'] = null
+		 request.json = '''{"email":'''+emailValue+''',
+						"password":'''+stringValue+''', 
+						 "password2":'''+stringValue+''',
+						"roleId":'''+4+''', 
+						 "name":'''+stringValue+''',
+						"username":'''+stringValue+
+						 '''}'''
+						
+		when:"signup action is invoked"
+		controller.signUp()
+		
+		then:
+		def result = controller.response.json
+		assert result.error == false
+		assert result.resp.email == emailValue
+		assert result.resp.name == stringValue
+		assert result.resp.username == stringValue
+		assert result.resp.roleId == 4
+		assert result.resp.isActive == true
+		assert controller.response.status == 200
+	}
+}

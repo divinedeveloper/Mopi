@@ -1,0 +1,18 @@
+package com.themopi.survey
+
+import com.themopi.location.City
+import com.themopi.location.Country
+
+class SponsoredSurveyLocation {
+	Survey survey
+	Map location
+	Country country
+	City city
+	static mapping = {
+		location geoIndex:'2d', indexAttributes:[min:-500, max:500]
+	}
+    static constraints = {
+		country nullable:true
+		city nullable:true
+    }
+}

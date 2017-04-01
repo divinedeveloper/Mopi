@@ -1,0 +1,170 @@
+
+package com.mopi.imageupload
+
+import grails.converters.JSON
+
+import java.awt.image.BufferedImage
+
+import javax.imageio.ImageIO
+
+import org.json.JSONObject
+import org.springframework.security.access.annotation.Secured
+
+import com.amazonaws.services.s3.transfer.Upload
+import com.themopi.exceptions.AccountException
+import com.themopi.exceptions.GiftException
+import com.themopi.exceptions.ImageException
+import com.themopi.exceptions.SurveyException
+
+@Secured('permitAll')
+class GiftimageuploadController {
+
+	def s3UploadService
+	def giftimageService
+	Map responseObject = [:]
+	def grailsApplication
+	def hdImageService 
+	def userService
+	def giftService
+	def surveyService
+	
+	def index() { }
+	def uploadImage()
+	{
+		JSONObject dashboardJsonlist = new JSONObject();
+		def imageUrl=null
+		
+		try
+			{
+				def userRole = userService.getUserAndRoleByAuthToken(request.getHeader("X-Auth-Token"))
+				def giftId = params.giftId
+				def surveyId = params.surveyId
+				def survey = surveyService.getSurveyById(surveyId)
+				
+				def gift = giftService.getGiftById(giftId)
+				println "user id is "+gift.user?.id
+				
+				if(userRole.user.id != gift.user?.id){
+					int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+					int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+					String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+					String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+					String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+		
+					throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+					
+				}
+				
+				if("Active".equals(survey?.status.toString()) || "flagged".equals(survey?.status.toString())){
+					
+					int errorCode = grailsApplication.config.customExceptions.gift.fourZeroThree.image.errorCode
+					int status = grailsApplication.config.customExceptions.gift.fourZeroThree.image.status
+					String message = grailsApplication.config.customExceptions.gift.fourZeroThree.image.message
+					String extendedMessage = grailsApplication.config.customExceptions.gift.fourZeroThree.image.extendedMessage
+					String moreInfo = grailsApplication.config.customExceptions.gift.fourZeroThree.image.moreInfo
+					
+					throw new GiftException(status,errorCode,message,extendedMessage,moreInfo)
+				}
+				
+				
+				def uploadedFile = request.getFile("myfile")
+				if(uploadedFile == null || uploadedFile.empty){
+					int errorCode = grailsApplication.config.customExceptions.image.fourZeroZero.image.errorCode
+					int status = grailsApplication.config.customExceptions.image.fourZeroZero.image.status
+					String message = grailsApplication.config.customExceptions.image.fourZeroZero.image.message
+					String extendedMessage = grailsApplication.config.customExceptions.image.fourZeroZero.image.extendedMessage
+					String moreInfo = grailsApplication.config.customExceptions.image.fourZeroZero.image.moreInfo
+					
+					throw new ImageException(status,errorCode,message, extendedMessage ,moreInfo)
+				}
+					try
+					{
+						String pathname = grailsApplication.config.myapp.tempImageFolderPath
+						def date = new Date()
+						String originalFileName =  date.getTime().toString()+uploadedFile.originalFilename.toString();
+						String originalFileExtension = uploadedFile.originalFilename.substring(uploadedFile.originalFilename.lastIndexOf("."))
+						
+						byte[] logoBytes10 = hdImageService.scale(uploadedFile.getInputStream(), grailsApplication.config.myapp.smallsize, grailsApplication.config.myapp.smallsize)
+						byte[] logoBytes100 = hdImageService.scale(uploadedFile.getInputStream(), grailsApplication.config.myapp.mediumsize, grailsApplication.config.myapp.mediumsize)
+						byte[] logoBytes200 = hdImageService.scale(uploadedFile.getInputStream(), grailsApplication.config.myapp.bigsize, grailsApplication.config.myapp.bigsize)
+						
+						try {
+							BufferedImage bf = hdImageService.getBufferedImage(logoBytes10)
+							ImageIO.write(bf, "jpg", new File(pathname+grailsApplication.config.myapp.small+originalFileName));
+							BufferedImage bf1 = hdImageService.getBufferedImage(logoBytes100)
+							ImageIO.write(bf1, "jpg", new File(pathname+grailsApplication.config.myapp.medium+originalFileName));
+							BufferedImage bf2 = hdImageService.getBufferedImage(logoBytes200)
+							ImageIO.write(bf2, "jpg", new File(pathname+grailsApplication.config.myapp.big+originalFileName));
+						} catch (IOException e) {
+						println "image check failed"
+							e.printStackTrace();
+						}
+						
+						uploadedFile.transferTo(new File(pathname+originalFileName))
+						/*uploadedFile.transferTo(new File(pathname+grailsApplication.config.myapp.small+originalFileName))
+						uploadedFile.transferTo(new File(pathname+grailsApplication.config.myapp.medium+originalFileName))
+						uploadedFile.transferTo(new File(pathname+grailsApplication.config.myapp.big+originalFileName))*/
+						
+						println originalFileName
+						println pathname
+						
+						Upload upload1 = s3UploadService.uploadFile(pathname,grailsApplication.config.myapp.small+originalFileName)
+						Upload upload = s3UploadService.uploadFile(pathname,originalFileName)
+						Upload upload2 = s3UploadService.uploadFile(pathname,grailsApplication.config.myapp.medium+originalFileName)
+						Upload upload3 = s3UploadService.uploadFile(pathname,grailsApplication.config.myapp.big+originalFileName)
+						
+						imageUrl=giftimageService.uploadImage(request,grailsApplication.config.myapp.imageBaseUsrl+originalFileName,params.giftId,params.surveyId);
+						println "imageUrlimageUrlimageUrlimageUrl"+imageUrl
+						
+						s3UploadService.deleteFile(pathname,grailsApplication.config.myapp.small+originalFileName)
+						s3UploadService.deleteFile(pathname,grailsApplication.config.myapp.medium+originalFileName)
+						s3UploadService.deleteFile(pathname,grailsApplication.config.myapp.big+originalFileName)
+						s3UploadService.deleteFile(pathname,originalFileName)
+						/*File fl=new File(pathname+originalFileName);
+						if(fl.exists())
+						{
+							fl.delete()
+						}*/
+						
+					}
+					catch(Exception e)
+					{
+						//imageUrl = grailsApplication.config.myapp.imageBaseUsrl+uploadedFile.originalFilename+originalFileExtension
+						println e.printStackTrace();
+					}
+				
+			
+			println "0000"+imageUrl
+			dashboardJsonlist.put("imageUrl", imageUrl)
+			responseObject.error = false
+			responseObject.resp = dashboardJsonlist.map
+			response.setStatus(200)
+			render responseObject as JSON
+			}
+			catch(ImageException e)
+			{
+				log.error e.errorResponse()
+				response.setStatus(e.errorResponse().status)
+				render e.errorResponse()
+			}
+			catch(AccountException e){
+				log.error e.errorResponse();
+				response.setStatus(e.errorResponse().status)
+				render e.errorResponse()
+			}
+			catch(GiftException e){
+				log.error e.errorResponse()
+				response.setStatus(e.errorResponse().status)
+				render e.errorResponse()
+			}
+			catch(SurveyException e){
+				log.error e.errorResponse()
+				response.setStatus(e.errorResponse().status)
+				render e.errorResponse()
+			}
+		
+	}
+	
+	
+}
+

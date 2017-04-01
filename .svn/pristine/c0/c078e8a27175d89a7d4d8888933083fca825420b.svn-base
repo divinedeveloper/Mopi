@@ -1,0 +1,10 @@
+package com.themopi.usermanagement
+
+class AuthenticationToken {
+    String email , authToken
+	
+    static constraints = {
+		email email:true,blank:false
+		authToken blank:false
+    }
+}

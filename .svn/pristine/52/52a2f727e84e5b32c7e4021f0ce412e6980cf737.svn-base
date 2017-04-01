@@ -1,0 +1,94 @@
+<div class="page" ng-controller="GiftCtrl">
+	<section class="panel panel-default ">
+
+		<div class="panel-heading" style="min-height: 40px;">
+		<div class="col-md-4 form-group" >
+			<strong><span class="glyphicon glyphicon-th"></span>Survey Gifts</strong>
+				</div>
+			
+				<div class="col-md-4 form-group">
+				<strong>{{survey.surveyCode}}</strong>
+<!-- 				<a href="" click-link="surveychartdetails/{{surveyid}}">{{gift.surveyCode}}</a> -->
+				</div>
+		</div>
+		<div class="panel-body">
+		<form name="Form" role="form">
+				<div class="row">
+					<div class="col-md-4 ">
+						<div ng-file-select="onFileSelect($files)" class=""
+							style="margin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+<!-- 							<img id="giftimage" src="images/assets/600_400-2.jpg" alt="" -->
+<!-- 								style="height: 172px;"> -->
+								<img id="giftimage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+"  ng-src="{{gift.imageUrlG}}" alt=""
+								style="height: 172px;">
+
+						</div>
+					</div>
+
+					<div class="col-md-7" style="margin-top: 30px;">
+
+						<div class="form-group">
+				
+							<div class="divider"></div>
+							<div class="row">
+								<div class="col-sm-10">
+									<label for="inputEmail3" class="col-md-10 " ng-show="!edit">
+									<span>{{gift.code}}</span>
+									
+										</label> 
+										<div ng-show="edit">
+										<input type="text" ng-model="gift.code" placeholder="Enter gift code"  class="form-control" id="inputEmail3" name="requireWatch" validator="required" required-error-message="Please enter gift code" valid-method="submit-only">
+										</div>
+								</div>
+							</div>
+							<div class="divider"></div>
+								<div class="row">
+								<div class="col-sm-10">
+									<label for="inputEmail3" class="col-md-10 " ng-show="!edit">
+									<span>{{gift.text}}</span>
+										</label> 
+									<div ng-show="edit">
+										<input type="text" ng-model="gift.text" placeholder="Enter gift title"  class="form-control" id="inputEmail3" name="requireWatch" validator="required" required-error-message="Please enter gift title" valid-method="submit-only">
+								</div>
+								</div>
+							</div>
+							<div class="divider"></div>
+								<div class="row">
+								<div class="col-sm-4">
+									<label for="inputEmail3" class="col-md-10 " ng-show="!edit">
+									<span ng-show="gift.maxNo=='unlimited'"> Unlimited gifts</span>
+									<span ng-show="gift.maxNo!='unlimited'">Max {{gift.maxNo}} gifts</span>
+										</label> 
+					<div ng-show="edit">					
+		<input type="text" ng-model="gift.maxNo" integer placeholder="Enter Max Gift" class="form-control" ><span>Blank field indicates Unlimited Gifts</span>		
+		</div>
+								</div>
+							</div>
+							<div class="divider"></div>
+			
+						</div>
+					</div>
+
+				</div>
+		
+
+
+				
+
+			</form>
+					<div class="row text-center">
+		<div class="form-group" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN']) && survey.status =='Draft'">
+			<button ng-show="giftid!='newgift' && !edit" class="btn btn-w-md btn-gap-v btn-danger"
+		ng-click="deleteGift()" type="button">Delete</button>
+	<button class="btn btn-w-md btn-gap-v btn-success"
+		ng-click="giftadd.submit(Form);saveGift(giftadd.checkValid(Form))" ng-show="edit" type="button">Save</button>
+	<button class="btn btn-w-md btn-gap-v btn-success"
+		ng-click="edit=true" ng-show="!edit" type="button">Edit</button>
+		<button ng-show="edit" ng-click="redirectToSurvey(giftid)"
+						class="btn btn-w-md btn-gap-v btn-info">Cancel</button>
+		</div>
+		</div>
+		</div>
+	</section>
+	
+	</div>

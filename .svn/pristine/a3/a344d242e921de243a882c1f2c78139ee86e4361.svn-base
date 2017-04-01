@@ -1,0 +1,239 @@
+package com.themopi
+
+import grails.transaction.Transactional
+
+import com.themopi.account.UserRole
+import com.themopi.exceptions.CommentException;
+import com.themopi.exceptions.SurveyException
+import com.themopi.survey.Comment
+import com.themopi.survey.CommentReports;
+import com.themopi.survey.Survey
+
+@Transactional
+class CommentService {
+	
+	static transactional = 'mongo'
+	def grailsApplication
+	def userService
+	def surveyService
+	
+	/**
+	 * function accepts the request from the request
+	 * Extract the X-Auth-Token from the header
+	 * find survey
+	 * Create new comment
+	 * increment comment count on a survey
+	 * @param request
+	 * @return comment object
+	 */
+	def createComment(request, surveyId) {
+		int errorCode = grailsApplication.config.customExceptions.comment.fourZeroZero.comment.errorCode
+		int status = grailsApplication.config.customExceptions.comment.fourZeroZero.comment.status
+		String message = grailsApplication.config.customExceptions.comment.fourZeroZero.comment.message
+		String extendedMessage = grailsApplication.config.customExceptions.comment.fourZeroZero.comment.extendedMessage
+		String moreInfo = grailsApplication.config.customExceptions.comment.fourZeroZero.comment.moreInfo
+		String tokenValue = request.getHeader('X-Auth-Token')
+		
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		
+		Survey survey = surveyService.getSurveyById(surveyId)
+		if(request.getJSON().comment == null || request.getJSON().comment == ""){
+			throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		Comment comment = new Comment(
+				commentedBy: userRole?.user,
+				comment: request.getJSON().comment,
+				commentOnSurvey: survey,
+				user:userRole?.user,
+				survey:survey
+				)
+
+		if(!comment.save()){
+			comment.errors.each{ println it}
+
+			throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+		}else{
+			incrementCommentCount(survey)
+		}
+		return comment
+	}
+	
+	/**
+	 * if comment saved then
+	 * increment comment count on a survey
+	 * @param survey
+	 * @return
+	 */
+	def incrementCommentCount(survey){
+		survey.commentCount = survey.commentCount + 1
+		survey.save()
+	}
+	
+	/**
+	 * if comment is hidden
+	 * decrement comment count on a survey
+	 * @param survey
+	 * @return
+	 */
+	def decrementCommentCount(survey,comment){
+		survey.commentCount = survey.commentCount - 1
+		if(comment.commentReportCount > 0){
+			survey.commentFlaggedCount = survey.commentFlaggedCount - 1
+		}
+		if(!survey.save()){
+			survey.errors.each{
+				println it 
+			}
+		}
+	}
+	
+	/**
+	 * finding comments of a particular survey
+	 * based on flag i.e flagged or unflagged comments
+	 * with pagination
+	 * @param survey
+	 * @param offset
+	 * @param limit
+	 * @param flagValue
+	 * @return
+	 */
+	def findAllComments(survey, offset, limit, flagValue){
+		offset = (offset == null )?0:offset
+		limit  = (limit == null)?10:limit
+		Boolean flag = new Boolean(flagValue)
+		List comments = []
+		def countValue
+		if(flag == true){
+			comments = Comment.findAllBySurveyAndCommentReportCountGreaterThanEqualsAndVisibility(survey, 1, true, [max:limit, offset:offset])
+			countValue = Comment.countBySurveyAndCommentReportCountGreaterThanEqualsAndVisibility(survey, 1, true)
+		}else{
+			comments = Comment.findAllBySurveyAndVisibility(survey, true, [max:limit, offset:offset])
+			countValue = Comment.countBySurveyAndVisibility(survey, true)
+		}
+
+		return [comments:comments, count: countValue]
+	}
+	
+	/**
+	 * hide a particular comment based on id
+	 * only admin can use this feature
+	 * @param tokenValue
+	 * @param commentId
+	 * @return
+	 */
+	def hideCommentById(tokenValue, commentId,surveyId){
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		Survey survey = surveyService.getSurveyById(surveyId)
+		int errorCode, status
+		String message, extendedMessage, moreInfo 
+		
+		if(userRole.role.authority == "ROLE_SUPERADMIN" || userRole.role.authority == "ROLE_ADMIN"){
+			Comment comment = Comment.findByIdAndVisibility(commentId, true)
+			if(comment == null){
+				errorCode = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.errorCode
+				status = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.status
+				message = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.message
+				extendedMessage = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.extendedMessage
+				moreInfo = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.moreInfo
+				
+				throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+			}else{
+				comment.visibility = false
+				comment.save()
+				decrementCommentCount(survey,comment);
+			}
+		}else{
+				errorCode = grailsApplication.config.customExceptions.comment.fourZeroThree.comment.errorCode
+				status = grailsApplication.config.customExceptions.comment.fourZeroThree.comment.status
+				message = grailsApplication.config.customExceptions.comment.fourZeroThree.comment.message
+				extendedMessage = grailsApplication.config.customExceptions.comment.fourZeroThree.comment.extendedMessage
+				moreInfo = grailsApplication.config.customExceptions.comment.fourZeroThree.comment.moreInfo
+				
+				throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		
+	}
+	
+	/**
+	 * Reports a particular comment
+	 * function accepts token value, surveyID and commentid
+	 * find reporter from tokenValue, comment from commentid
+	 * save comment report
+	 * @param tokenValue
+	 * @param surveyId
+	 * @param commentId
+	 * @return
+	 */
+	def reportCommentById(tokenValue, surveyId, commentId){
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		int errorCode, status
+		String message, extendedMessage, moreInfo
+
+		Survey survey = surveyService.getSurveyById(surveyId)
+		Comment comment = Comment.findByIdAndVisibility(commentId, true)
+
+		if(comment == null){
+			errorCode = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.errorCode
+			status = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.status
+			message = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.message
+			extendedMessage = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.extendedMessage
+			moreInfo = grailsApplication.config.customExceptions.comment.fourZeroFour.comment.moreInfo
+
+			throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+		}else{
+			CommentReports commentReport = new CommentReports(
+					reportedBy: userRole?.user,
+					commentedOn: comment,
+					user: userRole?.user,
+					comment: comment
+					)
+			if(!commentReport.save()){
+				commentReport.errors.each{ println it}
+
+				errorCode = grailsApplication.config.customExceptions.comment.fourZeroZero.commentReport.errorCode
+				status = grailsApplication.config.customExceptions.comment.fourZeroZero.commentReport.status
+				message = grailsApplication.config.customExceptions.comment.fourZeroZero.commentReport.message
+				extendedMessage = grailsApplication.config.customExceptions.comment.fourZeroZero.commentReport.extendedMessage
+				moreInfo = grailsApplication.config.customExceptions.comment.fourZeroZero.commentReport.moreInfo
+
+				throw new CommentException(status,errorCode,message,extendedMessage,moreInfo)
+			}else{
+				incrementCommentReportCount(comment,survey)
+				//incrementCommentFlaggedCount(survey)
+			}
+		}
+
+
+	}
+	
+	/**
+	 * increment comment report count by 1
+	 * If comment report count is greater than 10 auto hide than comment
+	 * @param comment
+	 * @return
+	 */
+	def incrementCommentReportCount(comment,survey){
+		comment.commentReportCount = comment.commentReportCount + 1
+		comment.save()
+		if(comment.commentReportCount == 1){
+			incrementCommentFlaggedCount(survey)
+		}
+		if(comment.commentReportCount > grailsApplication.config.myapp.commentReportCountThreshold){
+			comment.visibility = false
+			comment.save()
+			decrementCommentCount(survey,comment);
+		}
+
+	}
+	
+	/**
+	 * if comment is flagged on a survey then
+	 * increment comment flag count on a survey
+	 * @param survey
+	 * @return
+	 */
+	def incrementCommentFlaggedCount(survey){
+		survey.commentFlaggedCount = survey.commentFlaggedCount + 1
+		survey.save()
+	}
+}

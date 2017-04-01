@@ -1,0 +1,178 @@
+package com.themopi.timeline.api
+
+import java.awt.List;
+
+import org.springframework.data.mongodb.core.query.Update.Each;
+
+import grails.converters.JSON
+import grails.transaction.Transactional
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.TimelineException
+import com.themopi.survey.Survey
+import com.themopi.user.Followers
+import com.themopi.user.Timeline
+
+@Transactional
+class TimelineService {
+
+	def userService
+	def surveyService
+    def serviceMethod() {}
+	
+	def createCommentSurveyTimeline(request,userId,surveyId)
+	{
+		try
+		{
+			println "----i m in createCommentSurveyTimeline------"
+			/*int errorCode = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.errorCode
+			println "errorCode--"+errorCode
+			int status = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.status
+			println "status--"+status
+			String message = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.message
+			println "message---"+message
+			String extendedMessage = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.extendedMessage
+			println "extendedMessage---"+extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.moreInfo
+			println "moreInfo----"+moreInfo*/
+			String tokenValue = request.getHeader('X-Auth-Token')
+			UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+			User user = userRole.user;
+			User tempUser = User.findById(userId);
+			
+			println "request.getJSON().type--"+request.getJSON().type
+			println "request.getJSON().action--"+request.getJSON().action
+			def timeline = new Timeline(
+				performedBy:user,
+				action:request.getJSON().action,
+				type:request.getJSON().type,
+				isActive:request.getJSON().isActive,
+				dateCreated:new Date(),
+				lastUpdated:new Date(),
+				user:tempUser
+				);
+			println "timeline----------"+timeline
+			println "su-----"+surveyId
+			println "user---"+tempUser
+			
+			/*def ujson = tempUser as JSON
+			def sjson = survey as JSON
+			def str = sjson as String
+			
+			println "ujson--"+ujson
+			println "sjson---"+sjson*/
+			if(surveyId==null || surveyId.equals(null) || surveyId.equals("null") || surveyId=="null")
+			{
+				println "save for performedOn user"
+				timeline['performedOn'] = new JSON(tempUser).toString();
+			}
+			else
+			{
+				println "save for performedOn survey"
+				Survey survey = surveyService.getSurveyById(surveyId)
+				println "survey---"+survey
+				timeline['performedOn'] = new JSON(survey).toString();
+			}
+			
+			//timeline['performedOn'] = 'ranjit';
+			if(!timeline.save())
+			{
+				println "not save"
+				return "Not Save"
+			}
+			else
+			{
+				println "---------save"+timeline
+				return timeline;
+			}
+		}
+		catch(TimelineException et)
+		{
+			return "Error occuring When saving"
+		}
+		catch(Exception e)
+		{
+			return "Error occuring When saving"
+		}
+	}
+	def createFollowingUserTimeline()
+	{
+		
+	}
+	def createLikeSurveyTimeline()
+	{
+		
+	}
+	def updateCommentSurveyTimeline()
+	{
+		
+	}
+	def updateFollowingUserTimeline()
+	{
+		
+	}
+	def updateLikeSurveyTimeline()
+	{
+		
+	}
+	def getUserTimeline(request)
+	{
+		println "-----i m in getUserTimeline---"
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		//println "user---------------------------"+user
+		def followers=Followers.findAllByFollower(user)
+		//println "followers----"+followers
+		ArrayList<Timeline> obj = new ArrayList<Timeline>();
+		//def obj
+		for(int i=0;i<followers.size();i++)
+		{
+			/*println "followers[i].followers---"+followers[i].followers
+			println "Timeline.findByPerformedBy(followers[i].followers)---"+Timeline.findByPerformedBy(followers[i].followers)*/
+			def l=Timeline.findAllByPerformedBy(followers[i].followers)
+			//println "l----"+l
+			for(int j=0;j<l.size();j++)
+			{
+				obj.add(l[j])
+			}
+			
+		}
+		println "---"+obj
+		return obj 
+	}
+	def getFollowingUserTimeline(request)
+	{
+		println "-----i m in getFollowingUserTimeline---"
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		//println "user---------------------------"+user
+		def followee=Followers.findAllByFollowee(user)
+		/*println "followee---"+followee
+		println "followee.size---"+followee*/
+		
+		ArrayList<Timeline> obj = new ArrayList<Timeline>();
+		//def obj;
+		
+		for(int i=0;i<followee.size();i++)
+		{
+			/*println "followee[i].followee---"+followee[i].followee
+			println "Timeline.findByPerformedBy(followee[i].followee)---"+Timeline.findByPerformedBy(followee[i].followee)*/
+			
+			def l=Timeline.findAllByPerformedBy(followee[i].followee)
+			for(int j=0;j<l.size();j++)
+			{
+				obj.add(l[j])
+			}
+		}
+		//println "---"+obj
+		return obj 
+	}
+	def getLikeSurveyTimeline()
+	{
+		
+	}
+	
+}

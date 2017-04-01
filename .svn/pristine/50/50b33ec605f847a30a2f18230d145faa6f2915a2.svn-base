@@ -1,0 +1,50 @@
+
+package com.themopi.apis.security
+
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin;
+import spock.lang.Specification
+import grails.test.mixin.domain.DomainClassUnitTestMixin
+import com.themopi.account.AuthenticationToken
+
+/**
+ * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
+ */
+@TestFor(LogoutController)
+@Mock(AuthenticationToken)
+@TestMixin(DomainClassUnitTestMixin)
+class LogoutControllerSpec extends Specification {
+
+    def setup() {
+		println "logout setup"
+//		mockDomain(AuthenticationToken)
+    }
+
+    def cleanup() {
+		println "logout clean up"
+    }
+
+    void "test something"() {
+    }
+	
+	void "test logout"(){
+		given: "setting request params"
+		request.contentType = 'application/json'
+		request.addHeader("X-Auth-Token", "4tidn0vsooi8fkinmemacu6f23u9ud69")
+		
+		and: "a mock logout service"
+		def mockLogoutService = Mock(com.themopi.apis.security.LogoutService)
+		controller.logoutService = mockLogoutService 
+		
+		when: "logout action is invoked"
+		//		AuthenticationToken.metaClass.static.findByAuthToken()
+		controller.logout()
+		
+		then:
+		def result = controller.response.json
+		println result
+		
+		
+	}
+}

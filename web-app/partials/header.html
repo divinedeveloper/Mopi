@@ -1,0 +1,78 @@
+<header class="top-header clearfix">
+
+    <!-- Logo -->
+    <div class="logo"
+         ng-class="{ 'bg-dark': ['11','31'].indexOf(admin.skin) >= 0,
+                     'bg-white': admin.skin === '21',
+                     'bg-primary': ['12','22','32'].indexOf(admin.skin) >= 0,
+                     'bg-success': ['13','23','33'].indexOf(admin.skin) >= 0,
+                     'bg-info-alt': ['14','24','34'].indexOf(admin.skin) >= 0,
+                     'bg-warning': ['15','25','35'].indexOf(admin.skin) >= 0,
+                     'bg-danger': ['16','26','36'].indexOf(admin.skin) >= 0,
+                    }">
+        <a ng-if="authenticationfunction(['ROLE_SUPERADMIN'])" href="#/dashboard"> <span>{{main.brand}} </span> </a>
+        <a ng-if="authenticationfunction(['ROLE_SPONSEREDADMIN'])" href="#/survey"> <span>{{main.brand}} </span> </a>
+        <a ng-if="authenticationfunction(['ROLE_ADMIN'])" href="#/survey"> <span>{{main.brand}} </span> </a>
+        
+    </div>
+
+    <!-- needs to be put after logo to make it work -->
+     <!-- <div class="menu-button" toggle-off-canvas>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </div> -->
+
+    <div class="top-nav">
+    
+   <!--  <ul class="nav-left list-unstyled">
+    <li ng-if="authenticationfunction(['ROLE_SUPERADMIN'])"><a href="#/dashboard"> <i class="ti-home"></i><span data-i18n="Dashboard"></span> </a></li>
+       <li ng-if="authenticationfunction(['ROLE_SUPERADMIN'])"><a href="" ng-click="reload('user')"> <i class="ti-user"></i><span data-i18n="User Management"></span> </a></li>
+       <li ng-if="authenticationfunction(['ROLE_SUPERADMIN','ROLE_SPONSEREDADMIN','ROLE_ADMIN'])"><a href="" ng-click="reload('survey')"> <i class="ti-notepad"></i><span data-i18n="Survey"></span> </a></li>
+    </ul> -->
+    
+    <ul class="nav-left list-unstyled">
+           <!--  <li>
+                <a href="#/" data-toggle-nav-collapsed-min
+                             class="toggle-min"
+                             ><i class="ti-menu"></i></a>
+            </li> -->
+            
+            <li  ng-class="{menuactive: isActive('/dashboard')}" ng-if="authenticationfunction(['ROLE_SUPERADMIN'])"><a href="#/dashboard"> <i class="ti-home" style="padding-right: 6px;"></i><span class="visible-xs"></span><span class="  hidden-xs" data-i18n="Dashboard"></span> </a></li>
+           
+           	<li  ng-class="{menuactive: isActive('/user')}" ng-if="authenticationfunction(['ROLE_SUPERADMIN'])"><a href="" ng-click="reload('user')"> <i class="ti-user" style="padding-right: 6px;"></i><span class="visible-xs"></span><span class="  hidden-xs" data-i18n="User Management"></span> </a></li>
+           	
+           	<li ng-class="{menuactive: isActive('/survey')}" ng-if="authenticationfunction(['ROLE_SUPERADMIN','ROLE_SPONSEREDADMIN','ROLE_ADMIN'])" ><a href="" ng-click="reload('survey')"><i class="ti-notepad" style="padding-right: 6px;"></i><span class="visible-xs"></span><span class=" hidden-xs" data-i18n="Survey"></span></a></li>
+            
+        </ul>
+    
+ 
+        <ul class="nav-right pull-right list-unstyled">
+
+            <li class="dropdown text-normal nav-profile">
+                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+" alt="" class="img-circle img30_30" ng-src="{{userdata.resp.imageUrl}}">
+                    <span class="hidden-xs hidden-sm">
+                        <span data-i18n="{{userdata.resp.name}}"></span>
+                    </span>
+                </a>
+                <ul class="dropdown-menu with-arrow pull-right">
+                    <li>
+                        <a href="#userprofile/{{userdata.resp.id}}">
+                            <i class="ti-user"></i>
+                            <span data-i18n="My Profile"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="logout()">
+                            <i class="ti-export"></i>
+                            <span data-i18n="Log Out"></span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+   
+        </ul>
+    </div>
+
+</header>

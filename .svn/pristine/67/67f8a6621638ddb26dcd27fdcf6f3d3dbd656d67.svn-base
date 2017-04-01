@@ -1,0 +1,79 @@
+package com.themopi.apis.security
+
+
+
+import grails.test.spock.IntegrationSpec
+import spock.lang.*
+
+import com.themopi.account.User
+
+/**
+ *
+ */
+class RegistrationControllerIntegrationSpec extends IntegrationSpec {
+
+    def setup() {
+    }
+
+    def cleanup() {
+		//find user by email and delete it
+		User user = User.findByEmail("testinguser1@rkgtechllc.com")
+		if(user != null){
+			user.delete(flush:true)
+		}
+    }
+
+    void "test valid signup data"() {
+		given: "Initializing registration controller and setting request headers"
+		def registrationController = new RegistrationController()
+		registrationController.request.addHeader("contentType","application/json")
+		
+		and: "passing valid json data"
+		registrationController.request.content = '''{"email":"testinguser1@rkgtechllc.com",
+												 "password":"password",
+												 "password2":"password",
+												 "roleId":4,
+												 "name":"testinguser1",
+												 "username":"testinguser1"
+												}'''
+		when: "signup action is invoked"
+		registrationController.signUp()
+		
+		then: "testing success response from controller"
+		def result = registrationController.response.json
+		println "result is "+result
+		assert registrationController.response.status == 200
+		assert registrationController.response.json.error == false
+		assert registrationController.response.json.resp.email == "testinguser1@rkgtechllc.com"
+		assert registrationController.response.json.resp.roleId == 4
+		assert registrationController.response.json.resp.name == "testinguser1"
+		assert registrationController.response.json.resp.username == "testinguser1"
+	}
+	
+	void "test invalid signup data"() {
+		given: "Initializing registration controller and setting request headers"
+		def registrationController = new RegistrationController()
+		registrationController.request.addHeader("contentType","application/json")
+		
+		and: "passing blank email, username, roleId in json data"
+		registrationController.request.content = '''{"email":"",
+												 "password":"password",
+												 "password2":"password",
+												 "roleId":4,
+												 "name":"testinguser1",
+												 "username":""
+												}'''
+		when: "signup action is invoked"
+		registrationController.signUp()
+		
+		then: "testing error response from controller"
+		def result = registrationController.response.json
+		println "result is "+result
+		assert registrationController.response.status == 400
+		assert registrationController.response.json.status == 400
+		assert registrationController.response.json.error == true
+		assert registrationController.response.json.errorCode == 3400
+		assert registrationController.response.json.message == "Validation error. Creating a user failed"
+		assert registrationController.response.json.extendedMessage == "There is a validation error in creating the user. Fields failed validation checks."
+	}
+}

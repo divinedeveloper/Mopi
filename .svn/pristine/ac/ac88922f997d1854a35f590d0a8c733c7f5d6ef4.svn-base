@@ -1,0 +1,146 @@
+package com.themopi.apis.security
+
+
+
+import grails.test.spock.IntegrationSpec
+import spock.lang.*
+
+import com.themopi.account.AuthenticationToken
+import com.themopi.account.User
+
+/**
+ *
+ */
+class LogoutControllerIntegrationSpec extends IntegrationSpec {
+
+	def logoutService
+	def grailsApplication
+	
+    def setup() {
+		
+		//find user by email and delete it
+		/*User user = User.findByEmail("testinguser1@rkgtechllc.com")
+		println "user to delete is "+user
+		user.delete(flush:true)*/
+		
+		/*//then take credentials and do login
+		request.json = """{ "email":"testinguser1@rkgtechllc.com",
+							"password":"password"
+						}"""
+		
+		
+		response = post(grailsApplication.config.myapp.baseUrl+"/api/login", header("Content-Type", "application/json")) 
+		
+		
+		RestBuilder rest = new RestBuilder(proxy:['http://localhost:8080/mopi':8080])
+		rest.proxyForSystemProperties
+		System.setProperty("proxyHost", grailsApplication.config.myapp.baseUrl.toString());
+		System.setProperty("proxyPort", "8080");
+		def response = rest.post("/api/login") {
+			contentType "application/json"
+			json { 
+				email = "testinguser1@rkgtechllc.com"
+				password = "password"
+			}
+		}
+		
+		println "login rest api is completed........"
+		println " response from login apis is "+response
+		//get X-Auth-Token
+		String accessToken = response.access_token
+		println "setup accessToken is "+accessToken
+		
+		String email = response.email
+		println "setup email is "+email
+		
+		String roles = response.roles
+		println "setup roles is "+roles*/
+
+    }
+
+    def cleanup() {
+		//find user by email and delete it
+		User user = User.findByEmail("testinguser1@rkgtechllc.com")
+		if(user != null){
+			user.delete(flush:true)
+		}
+		
+    }
+
+     void "test valid logout"(){
+		 
+		given: "Creating user and saving auth token"
+		User user = new User(
+			email:"testinguser1@rkgtechllc.com",
+			password:"password",
+			name:"testinguser1",
+			accountLocked: false,
+			enabled: true,
+			accountExpired:false,
+			passwordExpired:false,
+			isActive:true,
+			username:"testinguser1",
+			tokenValue:null,
+			roleAuthority:"ROLE_USER",
+			roleId: new Long(4),
+			salt:"testinguser1@rkgtechllc.com"
+			)
+		user.save(failOnError: true)
+			
+		AuthenticationToken authToken = new AuthenticationToken(
+			username:"testinguser1",
+			authToken: java.util.UUID.randomUUID()
+			)
+		authToken.save(flush:true)
+		//get auth token to send in request header
+		String accessToken = authToken.authToken
+			
+		and: "Initializing logout controller and setting request headers"
+		def logoutController = new LogoutController()
+		logoutController.request.addHeader("contentType","application/json")
+		
+		and: "setting valid X-Auth-Token"
+		logoutController.request.addHeader("X-Auth-Token", accessToken)
+		
+		and: "defining logoutService"
+		logoutController.logoutService = logoutService
+		
+		when: "logout action is invoked"
+		logoutController.logout()
+		
+		then: "testing success response from controller"
+		def result = logoutController.response.json
+		logoutController.response.json.status == 200
+		logoutController.response.json.success == true
+		logoutController.response.status == 200
+		
+		
+	}
+	
+	void "test invalid logout"(){
+		given: "Initializing logout controller and setting request headers"
+		def logoutController = new LogoutController()
+		logoutController.request.addHeader("contentType","application/json")
+		
+		and: "setting blank X-Auth-Token"
+		logoutController.request.addHeader("X-Auth-Token", "")
+		
+		and: "defining logoutService"
+		logoutController.logoutService = logoutService
+		
+		
+		when: "logout action is invoked"
+		logoutController.logout()
+		
+		then: "An exception is thrown"
+		def result = logoutController.response.json
+		logoutController.response.json.status == 404
+		logoutController.response.json.error == true
+		logoutController.response.json.errorCode == 4004
+		logoutController.response.json.message == "Authorization token not found."
+		logoutController.response.json.extendedMessage == "Trying to find authorization token failed. No entry available"
+		logoutController.response.status == 404
+		
+		
+	}
+}

@@ -1,0 +1,67 @@
+package com.mopi.imageupload
+
+import com.amazonaws.services.s3.transfer.Upload
+
+import grails.converters.JSON
+
+import java.awt.image.BufferedImage
+import java.util.Map;
+
+import org.json.JSONObject
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
+
+@Secured('permitAll')
+class SurveyimageuploadController {
+
+	def S3UploadService
+	def SurveyimageService
+	Map responseObject = [:]
+	def grailsApplication
+	
+    def index() { }
+	def uploadImage()
+	{
+		JSONObject dashboardJsonlist = new JSONObject();
+		def imageUrl=null
+		try{
+			
+			if(request)
+			{
+				def uploadedFile = request.getFile("myfile")
+				if(!uploadedFile.empty)
+				{
+					try
+					{
+						String pathname = grailsApplication.config.myapp.tempImageFolderPath
+						uploadedFile.transferTo(new File(pathname))
+						pathname = pathname
+						Upload upload = S3UploadService.uploadFile(pathname,uploadedFile.originalFilename)
+						imageUrl=SurveyimageService.uploadImage(request,"https://s3-ap-southeast-1.amazonaws.com/mopi-tmp-media/"+uploadedFile.originalFilename,params.surveyId);
+					}
+					catch(Exception e)
+					{
+						imageUrl = "https://s3-ap-southeast-1.amazonaws.com/mopi-tmp-media/"+uploadedFile.originalFilename
+						println e.printStackTrace();
+					}
+				}
+				else
+				{
+					flash.message = "file cannot be empty"
+				}
+			}
+			println "0000"+imageUrl
+			dashboardJsonlist.put("imageUrl", imageUrl)
+			responseObject.error = false
+			responseObject.resp = imageUrl
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(Exception e){
+			/*log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)*/
+			render e
+		}
+		
+	}
+}

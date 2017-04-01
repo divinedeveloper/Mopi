@@ -1,0 +1,84 @@
+
+<div class="page" ng-controller="UserCtrl">
+
+	<section class="panel panel-default table-dynamic"
+		style="margin-top: 2%;">
+
+		<div class="panel-heading">
+			<strong><i class="ti-user"></i> Users List</strong>
+		</div>
+		<!--  <div class="row"> -->
+		<!--  <div class="col-md-6"> -->
+		<!--  <button class="btn btn-success" ng-click="type='new';openModal()"><span class="glyphicon glyphicon-plus"></span> &nbsp;&nbsp;&nbsp;Add New User</button> -->
+		<!--  </div> -->
+		<!--  </div> -->
+
+		<div class="table-filters">
+			<div class="row">
+				<div class="col-md-4 form-group">
+					<form>
+						<div class="input-group">
+							<input type="text" class="form-control" ng-model="search.query">
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default"
+									ng-click="tableParams.$params.page = 1;tableParams.reload()">Go!</button>
+							</span>
+						</div>
+					</form>
+				</div>
+
+				
+					<div class="col-md-2 form-group ">
+						<select class="form-control" chosen ng-model="search.status" data-placeholder="Select Status"
+							ng-options="stat.status as stat.name for stat in statususer"
+							ng-change="tableParams.$params.page = 1;tableParams.reload()">
+							<option value=""></option>
+						</select>
+
+					</div>
+					<div class="col-md-2 form-group">
+						<select class="form-control" chosen ng-model="search.roleId" data-placeholder="Select Role"
+							ng-options="role.id as role.displayAuthority for role in rolelist"
+							ng-change="tableParams.$params.page = 1;tableParams.reload()">
+							<option value=""></option>
+
+						</select>
+					</div>
+					<div class="col-sm-2 form-group"
+						ng-if="authenticationfunction(['ROLE_SUPERADMIN'])">
+						<button class="btn btn-success" click-link="userprofile/newuser">
+							<span class="ti-plus"></span> Add User
+						</button>
+					</div>
+				
+
+			</div>
+		</div>
+		<div ng-show="tableParams.data.length==0"> <label style="padding-left: 20px;">No Users</label></div>
+		<div class="table-responsive" style="margin-top: 2%;vertical-align: middle;" ng-show="tableParams.data.length>0">
+			<table ng-table="tableParams"
+				class="table table-hover" width="500px">
+				<tr ng-repeat="user in $data" click-link="userprofile/{{user.id}}">
+					<td data-title="''" width="30"><img
+						class="img-rounded img64_64" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+" ng-src="{{user.imageUrl}}" alt=""></td>
+					<td data-title="'Name'" style="vertical-align: middle;">
+						{{user.name}}</td>
+					<td data-title="'Status'" style="vertical-align: middle;"><span
+						ng-show=user.status==true>Active</span> <span
+						ng-show=user.status==false>Inactive</span></td>
+					<td data-title="'Surveys'" style="vertical-align: middle;">
+						{{user.surveyCount}} &nbsp; &nbsp;surveys</td>
+					<td data-title="''" style="vertical-align: middle;"><a
+						class="btn-icon-lined btn-icon-round btn-icon-md btn-gap-v btn-info pull-right"
+						href="javascript:;"> <span class="glyphicon glyphicon-pencil"></span>
+					</a></td>
+				</tr>
+			</table>
+
+		</div>
+
+
+	</section>
+
+
+</div>

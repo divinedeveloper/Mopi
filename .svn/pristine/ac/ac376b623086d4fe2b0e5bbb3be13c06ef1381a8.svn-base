@@ -1,0 +1,67 @@
+package com.themopi.apis
+
+import java.util.Map;
+
+import com.themopi.exceptions.SurveyException
+import com.themopi.survey.Question
+import com.themopi.survey.Survey
+import com.themopi.survey.SurveyReports
+import com.themopi.surveyactivity.*
+
+import grails.converters.*
+
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
+
+@Secured('permitAll')
+class SurveyReportController {
+
+	def surveyService
+	Map responseObject = [:]
+    def index() { }
+	def creatSurveyReport()
+	{
+		try{
+			String tokenValue = request.getHeader('X-Auth-Token')
+			println "tokenValue---"+tokenValue
+			SurveyReports surveyReports = surveyService.createSurveyReport(request,params.surveyId,tokenValue)
+			responseObject.error = false
+			responseObject.resp = surveyReports
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	def deleteSurveyReport()
+	{
+		try{
+			Survey survey = surveyService.deleteSurveyReport(request)
+			responseObject.error = false
+			responseObject.resp = survey
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	def getSurveyReportBySurvey()
+	{
+		try{
+			Survey survey = surveyService.getSurveyReportBySurvey(request)
+			responseObject.error = false
+			responseObject.resp = survey
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+}

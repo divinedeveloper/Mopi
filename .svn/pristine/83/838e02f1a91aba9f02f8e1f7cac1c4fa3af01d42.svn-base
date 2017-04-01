@@ -1,0 +1,78 @@
+package com.themopi.survey
+
+import java.text.Format
+import java.text.SimpleDateFormat
+
+import com.themopi.account.User
+
+class Survey {
+	
+	List<Question> questions = []
+	List<String> visiblityCountry = []
+	List<String> visiblityCity  =[]
+	List<HashTag> hashTag = []
+	
+	User lastUpdatedBy
+	String name 
+	String surveyCode
+	String imageUrl
+	SurveyType surveyType
+	Boolean isActive = true , visibility = true
+	Integer surveyFlaggedCount = 0
+	Integer commentFlaggedCount = 0
+	Integer commentCount = 0
+	User user
+	Date dateCreated, lastUpdated, startTime, endTime
+	Gift gift
+	Integer giftCount
+	Integer giftDistributed
+	
+	Integer respCount = 0
+	Status status
+	VisibleTo visibleTo
+	enum VisibleTo{
+		Followers,EveryOne
+	}
+	enum Status{
+		Draft,Active,Inactive,flagged,Autohidden,hidden
+	}
+	
+	enum SurveyType{
+		sponsered,nonsponsered
+	}
+	static hasMany = [responses: Response,hashTag:HashTag,visiblityCountry:String,visiblityCity:String,questions:Question]
+	
+	static belongsTo  = [user: User]
+	
+	
+	static embedded = ['questions', 'hashTagBy','visiblityCountry','visiblityCity','gift']
+	
+	
+	/*enum SurveyType{
+		
+	}*/
+
+	static constraints = {
+		name blank:false,nullable:false
+		surveyType blank: false, nullable: false
+		questions min: 1, max: 15
+		startTime nullable:true
+		endTime nullable:true
+		commentCount default:0
+		surveyFlaggedCount default:0
+		commentFlaggedCount default:0
+		imageUrl nullable:true
+		giftCount nullable:true,default:0
+		giftDistributed nullable:true,default:0
+		gift nullable:true
+		respCount nullable:true,default:0
+
+	}
+	
+	
+	def responseCount(){
+		Set users= this.responses?.user?.id?.toSet()
+		return users?.size()
+	}
+	
+}

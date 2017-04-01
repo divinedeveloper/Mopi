@@ -1,0 +1,79 @@
+package com.themopi.apis
+
+import java.util.Map;
+
+import grails.converters.*
+
+import org.springframework.security.access.annotation.Secured
+
+import com.themopi.exceptions.GiftException
+import com.themopi.exceptions.SurveyException
+import com.themopi.survey.Gift
+
+@Secured('permitAll')
+class GiftController {
+
+	def giftService
+	Map responseObject = [:]
+	
+	def addGift(){
+		try{
+			
+			int i=0
+			Gift gift = giftService.createGift(request,params.surveyId,i)
+			responseObject.error = false
+			responseObject.resp = gift
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+		catch(GiftException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	
+	def updateGift(){
+		try{
+			
+			Gift gift = giftService.createGift(request,params.surveyId,params.giftId)
+			responseObject.error = false
+			responseObject.resp = gift
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+		catch(GiftException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	def deleteGift(){
+		try{
+			
+			int i=1;
+			Gift gift = giftService.deleteGift(params.surveyId,params.giftId)?null:null
+			responseObject.error = false
+			responseObject.resp = gift
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(SurveyException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+		catch(GiftException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+}

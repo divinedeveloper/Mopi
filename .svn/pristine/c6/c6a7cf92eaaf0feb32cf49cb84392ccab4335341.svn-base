@@ -1,0 +1,57 @@
+<div class="page page-table" data-ng-controller="SurveyCtrl">
+	<section class="panel panel-default table-dynamic">
+		<div class="panel-heading">
+			<strong><span class="glyphicon glyphicon-th"></span>Survey</strong>
+		</div>
+
+		<div class="table-filters">
+			<div class="row">
+				<div class="col-sm-4 col-xs-6">
+					<form>
+						<div class="input-group">
+							<input ng-model="searchparams" type="text" class="form-control"> <span
+								class="input-group-btn">
+								<button ng-click="surveyresuts.$params.page = 1;surveyresuts.reload()" type="button" class="btn btn-default">Go!</button>
+							</span>
+						</div>
+					</form>
+				</div>
+
+				<div class="col-md-2">
+					<select class="form-control" ng-change="surveyresuts.$params.page = 1;surveyresuts.reload()" data-placeholder="Status" chosen
+						disable-search="true" ng-model="status"
+						ng-options="stat.name as stat.name for stat in statusavailable">
+						<option value=""></option>
+					</select>
+				</div>
+				<div class="col-sm-3 col-xs-6" ng-if="authenticationfunction(['ROLE_SPONSEREDADMIN'])">
+					<button class="btn btn-success"
+						click-link="surveydetails/newsurvey">
+						<span class="ti-plus"></span> Create
+					</button>
+				</div>
+
+
+
+			</div>
+
+		</div>
+
+
+<table ng-table="surveyresuts"
+	class="table table-responsive table-hover table-bordered">
+	<tr ng-repeat="user in $data" click-link="surveydetails/{{user.id}}">
+
+		<td data-title="" style="vertical-align: middle;">
+		<img class="img-rounded img64_64" src="images/g1.jpg" ng-src="{{user.imageUrl}}" alt=""><span
+			style="margin-left: 10px;">{{user.name}}</span></td>
+
+		<td data-title="" style="vertical-align: middle;">{{user.status}}</td>
+		<td data-title="" style="vertical-align: middle;">{{user.responses}}
+			Responses</td>
+		<td data-title="" style="vertical-align: middle;">{{user.user.name}}</td>
+	</tr>
+</table>
+
+</section>
+</div>

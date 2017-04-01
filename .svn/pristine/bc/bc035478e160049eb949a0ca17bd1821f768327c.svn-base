@@ -1,0 +1,69 @@
+package com.themopi.image
+
+import com.themopi.account.UserRole
+import com.themopi.exceptions.ImageUploadException
+import com.themopi.survey.Question;
+import com.themopi.survey.Survey
+
+import grails.transaction.Transactional
+
+@Transactional
+class QuestionimageService {
+
+	def grailsApplication
+	def userService
+	def questionService
+	def surveyService
+     def uploadImage(request,imageUrl,questionId,surveyId) {
+		
+		int errorCode = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.errorCode
+		int status = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.status
+		String message = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.message
+		String extendedMessage = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.extendedMessage
+		String moreInfo = grailsApplication.config.customExceptions.gift.fourZeroNine.gift.moreInfo
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		def question = Question.findById(questionId)
+		println "----question-----question----"+question
+		question.imageUrlQ=imageUrl
+	   if(!question.save()){
+			question.errors.each{
+				println it
+			}
+		}
+	   
+	   ///
+	   println "-----------------"
+	   println "surveyId--"+surveyId
+	   def questionList = []
+	   Question tquestion = null
+	   //Survey survey = Survey.findById(surveyId)
+	   Survey survey = surveyService.getSurveyById(surveyId)
+	   println "survey---"+survey
+	   survey.questions.each{
+		   println it.id
+		   if( it.id == questionId.toInteger()){
+			   tquestion = it
+			   println it
+		   }else{
+			   questionList.add(it)
+		   }
+	   }
+
+	   
+
+	   questionList.add(question)
+	  
+	   survey.questions = questionList
+	   if(!survey.save()){
+		   survey.errors.each{
+			   println it
+		   }
+	   }
+	   
+	   println survey.questions
+	   return question
+	   ////
+	   //return imageUrl
+    }
+}

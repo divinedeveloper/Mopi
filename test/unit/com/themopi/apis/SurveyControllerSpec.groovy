@@ -1,0 +1,106 @@
+package com.themopi.apis
+
+import grails.test.mixin.*
+import spock.lang.Specification
+import spock.lang.Unroll
+
+import com.themopi.account.User
+import com.themopi.exceptions.AccountException
+import com.themopi.survey.Survey
+import com.themopi.utils.GenerateDataUtils
+
+import grails.converters.JSON
+/**
+ * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
+ */
+@TestFor(SurveyController)
+class SurveyControllerSpec extends Specification {
+
+    def setup() {
+		
+    }
+
+    def cleanup() {
+    }
+
+	/*void "test search"() {
+		given:
+		def Mock = mockFor(grailsApplication)
+		
+		String path = "C:\\Users\\PREMPRAKASH\\Desktop\\tempTextFile\\survey.json"
+		println "path---"+path
+		Survey survey
+		def json = JSON.parse(new FileInputStream(path), "UTF-8")
+		int surveyId = json.content.surveys.surveyId
+		String token = java.util.UUID.randomUUID()
+		String surveyName = "AS"
+		String visibility = "SA"
+		String status1 = "Inactive"
+		request.contentType = 'application/json'
+		request.addHeader("X-Auth-Token",token)
+		request.content = '''{"name":'''+surveyName+''',
+												"visiblity":true,
+											    "startTime":"2014-12-29",
+											    "endTime":"2014-12-30",
+											    "visibleTo":'''+visibility+''',
+												"status":'''+status1+''',
+											    "cityList":["India","Pakistan"],
+											    "countryList":["Mumbai","Delhi"]
+											    }'''
+		params.surveyId = surveyId
+		def searchMock = mockFor(com.themopi.surveyactivity.SurveyService)
+		searchMock.demand.updateSurvey {survey -> throw new SurveyException(status,errorCode,message,extendedMessage,moreInfo)}
+		searchMock.demand.static.logResults { List results ->  }
+		controller.surveyService = searchMock.createMock()
+
+		when:
+		controller.update()
+
+		then:
+		controller.response.text.contains "Found 2 results"
+		def result = controller.response.json
+	}*/
+	
+   /*@Unroll("test Survey for update #Survey")
+    void "test update survey"() {
+		String token = java.util.UUID.randomUUID()
+		given: "setting request headers"
+		request.contentType = 'application/json'
+		request.addHeader("X-Auth-Token",token)
+		params.surveyId = 1
+		params.visiblity = true
+		params.startTime = new Date()
+		params.endTime = new Date()
+		params.visibleTo = 'Individual'
+        params.status = 'Inactive'
+		String surveyName = "AS"
+		String visibility = "SA"
+		String status = "Inactive"
+		request.content = '''{"name":'''+surveyName+''',
+												"visiblity":true,
+											    "startTime":"2014-12-29",
+											    "endTime":"2014-12-30",
+											    "visibleTo":'''+visibility+''',
+												"status":'''+status+''',
+											    "cityList":["India","Pakistan"],
+											    "countryList":["Mumbai","Delhi"]
+											    }'''
+			
+		def mockUserService = mockFor(com.themopi.surveyactivity.SurveyService)
+		mockUserService.demand.updateSurvey{email -> throw new AccountException(status,errorCode,message,extendedMessage,moreInfo) }
+		controller.surveyService = mockUserService.createMock()
+		
+		and: "mock survey service and throw account exception"
+		
+		when: "update survey action is invoked"
+		controller.update()
+		
+		then: "test error response from controller"
+		def result = controller.response.json
+		assert result.status == 404
+		assert result.errorCode == 4004
+		assert result.message == message
+		assert result.extendedMessage == extendedMessage		
+		
+    }*/
+}

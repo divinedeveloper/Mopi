@@ -1,0 +1,142 @@
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+   <div class="modal-header">
+   <button type="button" class="close" ng-click="$close();">&times;</button>
+            <h3 class="modal-title" >Add User</h3>
+<!--             <h3 class="modal-title" ng-show="type=='edit'">Edit User</h3> -->
+        </div>
+        <div class="modal-body">
+         
+                    <form class="form-horizontal" role="form" name="adduser">
+
+ <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Role Type</label>
+                            <div class="col-sm-7">
+                    <select class="form-control" ng-model="user.role" ng-options=" role.id as role.authority for role in rolelist">
+                            <option>---Role---</option>
+                         
+                        </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Name</label>
+                            <div class="col-sm-7">
+                   <input type="text" ng-model="user.name" class="form-control" id="inputEmail3" placeholder="Name">
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Email </label>
+                            <div class="col-sm-7">
+                                <input type="email" ng-model="user.email" class="form-control" id="inputEmail3" placeholder="Name">
+                            </div>
+                        </div>
+             
+                         <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Password</label>
+                            <div class="col-sm-7">
+                                <input type="password" ng-model="user.password" class="form-control" id="inputPassword3" placeholder="Password">
+                            </div>
+                        </div>
+                          <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Confirm Password</label>
+                            <div class="col-sm-7">
+                                <input type="password" name="cpassword" ng-model="user.password2" class="form-control" id="inputPassword3" placeholder="Confirm Password" required password-verify="user.password" >
+                                <span data-ng-show="adduser.cpassword.$error.passwordVerify">Password have to match!</span>
+                            </div>
+                        </div>
+ <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Description</label>
+                            <div class="col-sm-7">
+                                <textarea name="" id="" ng-model="user.description" class="form-control" rows="4"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label"><i class="ti-calendar"></i>DOB </label>
+                            <div class="col-sm-7">
+                           <input type="text" class="form-control" data-date-format="yyyy-MM-dd" ng-model="user.dob" name="date" bs-datepicker>
+                            </div>
+                        </div>
+ <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Status</label>
+                            <div class="col-sm-7">
+                              <label class="ui-switch"><input type="checkbox" ng-model="user.status" checked><i></i></label>
+                            </div>
+                        </div>
+
+ <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Hometown</label>
+                            <div class="col-sm-7">
+                           <input type="text" id="Autocomplete2" ng-model="user.location" class="form-control" ng-autocomplete options="options" details="details"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Phone number</label>
+                            <div class="col-sm-7">
+                                <input type="number" class="form-control" ng-model="user.phoneNumber" id="inputPassword3" placeholder="Phone Number">
+                            </div>
+                        </div>
+                          <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-4 control-label">Mobile number</label>
+                            <div class="col-sm-7">
+                                <input type="number" class="form-control" ng-model="user.mobile" id="inputPassword3" placeholder="Mobile Number">
+                            </div>
+                        </div>
+                               <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Gender</label>
+                            <div class="col-sm-7">
+                    <select class="form-control" ng-model="user.gender">
+                            <option values="Male">Male</option>
+                            <option values="Female">Female</option>
+                          
+                        </select>
+                            </div>
+                        </div>
+                                     <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Religion</label>
+                            <div class="col-sm-7">
+                    <select class="form-control" ng-model="user.religion">
+                   <option values="Atheist">Atheist</option>
+                   <option values="Buddhist">Buddhist</option>
+                  <option values="Christian">Christian</option>
+                   <option values="Hindu">Hindu</option>
+                     <option values="Muslim">Muslim</option>
+                    
+                          
+                        </select>
+                            </div>
+                        </div>
+                       <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-4 control-label">Occupation</label>
+                            <div class="col-sm-7">
+                    <select class="form-control" ng-model="user.occupation">
+                            <option values="Art & Design">Art & Design</option>
+                            <option values="Business">Business</option>
+                            <option values="Education">Education</option>
+                            <option values="Engineering">Engineering</option>
+                            <option values="Health">Health</option>
+                            <option values="Hospitality & Culinary">Hospitality & Culinary</option>
+                            <option values="Law & Criminal Justice">Law & Criminal Justice</option>
+                            <option values="Liberal Arts">Liberal Arts</option>
+                            <option values="Science">Science</option>
+                            <option values="Social Science">Social Science</option>
+                            <option values="Technology & IT">Technology & IT</option>
+                            <option values="Vocational">Vocational</option>
+                            <option values="Others">Others</option>
+                         
+                        </select>
+                            </div>
+                        </div>  
+                        
+                    </form>  
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="$hide()">Cancel</button>
+            <button class="btn btn-success" busy="Submitting.." ng-click="createuser(user,details);">Save</button>
+        </div>
+        </div>
+        </div>
+        </div>
+        

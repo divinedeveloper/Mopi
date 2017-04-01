@@ -1,0 +1,11 @@
+package com.themopi.achievements
+
+import grails.transaction.Transactional
+
+@Transactional
+class BadgeService {
+
+    def serviceMethod() {
+
+    }
+}

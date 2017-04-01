@@ -1,0 +1,35 @@
+package com.themopi.exceptions
+
+import java.sql.Timestamp
+
+import org.codehaus.groovy.grails.web.json.JSONObject
+
+public  class BaseException extends Exception {
+	private int status ;
+	private String devMessage;
+	private String extendedMessage;
+	private String moreInfo;
+	private int errorCode;
+	boolean error = true;
+	
+	public BaseException(int status,int errorCode,String message, String extendedMessage ,String moreInfo){
+		this.errorCode =  errorCode;
+		this.status = status;
+		this.devMessage = message;
+		this.extendedMessage = extendedMessage;
+		this.moreInfo = moreInfo;
+	}
+	
+	public JSONObject errorResponse(){
+		JSONObject errorJson = new JSONObject();
+		errorJson.put("status",this.status);
+		errorJson.put("errorCode",this.errorCode);
+		errorJson.put("message",this.devMessage);
+		errorJson.put("extendedMessage",this.extendedMessage);
+		errorJson.put("moreInfo",this.getMessage());
+		errorJson.put("error",error);
+//		errorJson.put("dateTimeStamp", new Timestamp(new Date().time).toString());
+		errorJson.put("dateTimeStamp", new Date().time);
+		return errorJson;
+	   }
+}

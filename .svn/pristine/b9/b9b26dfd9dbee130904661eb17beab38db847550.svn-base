@@ -1,0 +1,71 @@
+package com.themopi.apis.search
+
+import com.themopi.account.User
+import com.themopi.account.UserRole;
+import com.themopi.exceptions.AccountException
+
+import grails.converters.JSON
+
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.security.access.annotation.Secured;
+@Secured('permitAll')
+class SearchController {
+	
+	def userService
+	def searchService
+	def surveySearchService
+	def responseObject = [:]
+
+//    def index() { }
+	
+	/**
+	 * find users with survey count based on search params
+	 * with pagination
+	 * @return
+	 */
+	def searchUser(){
+		try{
+			String tokenValue = request.getHeader('X-Auth-Token')
+			println params		
+			
+			def userList = searchService.getUsers(params.roleId,params.query,params.status,params.offset,params.limit)
+			println userList
+			responseObject.error = false
+			responseObject.resp = userList
+			response.setStatus(200)
+			render responseObject as JSON
+		}catch(AccountException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+	}
+	
+	/**
+	 * action to search on survey using pagination
+	 * @param name (will accept name or id)
+	 * @param status
+	 * @return
+	 */
+	def searchSurvey(){
+		try{
+			String tokenValue = request.getHeader('X-Auth-Token')
+			def searchResult  = surveySearchService.search(tokenValue,params.name,params.status,params.offset,params.limit)
+			responseObject.error = false
+			responseObject.resp = searchResult
+			response.setStatus(200)
+			render responseObject as JSON
+			  
+		}catch(AccountException e){
+			log.error e.errorResponse()
+			response.setStatus(e.errorResponse().status)
+			render e.errorResponse()
+		}
+		
+	}
+	
+	def appSearch(){
+		def surveys = surveySearchService.appSearch(params.searchCategory,params.limit,params.offset)
+		return surveys as JSON
+	}
+}

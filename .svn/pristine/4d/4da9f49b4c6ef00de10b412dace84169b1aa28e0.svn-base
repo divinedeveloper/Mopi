@@ -1,0 +1,20 @@
+package com.themopi.connections
+
+
+
+import spock.lang.*
+
+/**
+ *
+ */
+class ConnectionServiceSpec extends Specification {
+
+    def setup() {
+    }
+
+    def cleanup() {
+    }
+
+    void "test something"() {
+    }
+}

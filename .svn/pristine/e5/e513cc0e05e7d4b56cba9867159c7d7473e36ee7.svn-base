@@ -1,0 +1,176 @@
+package com.themopi.connections
+
+import grails.transaction.Transactional
+import com.themopi.account.* 
+import com.themopi.exceptions.AccountException
+import com.themopi.user.Followers
+
+@Transactional
+class ConnectionService {
+	def userService
+	def grailsApplication
+	/**
+	 * request for following
+	 * @param userId
+	 * @param tokenValue
+	 * @return
+	 */
+	def followUser(userId,tokenValue){
+		def followee  = userService.findUserByUserId(userId)
+		def user = userService.getUserAndRoleByAuthToken(tokenValue)?.user
+		def followerObject = Followers.findByUserAndFollowee(user,followee)
+		if(followerObject == null){
+		Followers follow = new Followers(
+			requested:true,
+			user:user,
+			followee:followee,
+			follower:user
+		)
+		if(!follow.save()){
+			follow.errors.each{
+				println it 
+			}
+			return false
+		}
+		return true
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.connection.fourZeroNine.connection.errorCode
+			int status = grailsApplication.config.customExceptions.connection.fourZeroNine.connection.status
+			String message = grailsApplication.config.customExceptions.connection.fourZeroNine.connection.message
+			String extendedMessage = grailsApplication.config.customExceptions.connection.fourZeroNine.connection.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.connection.fourZeroNine.connection.moreInfo
+
+			throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	/**
+	 * get the list of followers
+	 * @param tokenValue
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	def getPeopleFollowingMe(userId,limit,offset){
+		def user = userService.findUserByUserId(userId)
+		println "user-name = "+user.name
+		println "id == "+ user.id
+		
+		def followers = Followers.findAllByFolloweeAndAllowFollowing(user,true,['max':limit,'offset':offset])
+		println "followers == "+followers
+		return followers
+	}
+	
+	/**
+	 * get the followers and followee
+	 * @param tokenValue
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	def getConnections(userId,limit,offset){
+		def user = userService.findUserByUserId(userId)
+		def query = Followers.where {
+			(follower == user || followee == user) && (allowFollowing == true)
+		}
+		def connections = query.list('max':limit,'offset':offset)
+		//def connections = Followers.findAllByUserOrFollowee(user,['max':limit,'offset':offset])
+		return connections
+	}
+	
+	/**
+	 * get the list of followee
+	 * @param tokenValue
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	def getPeopleFollowedByMe(userId,limit,offset){
+		def user = userService.findUserByUserId(userId)
+		println "user-name 1 = "+user.name
+		println "id == "+ user.id
+		def followees = Followers.findAllByFollowerAndAllowFollowing(user?.id,true,['max':limit,'offset':offset])
+		return followees
+	}
+	
+	/**
+	 * get the list of people who requested 
+	 * @param tokenValue
+	 * @param limit
+	 * @param offset
+	 * @return
+	 */
+	def getPeopleRequestedMe(tokenValue,limit,offset){
+		def user = userService.getUserAndRoleByAuthToken(tokenValue)?.user
+		def followees = Followers.findAllByFolloweeAndRequested(user,true,['max':limit,'offset':offset])
+		return followees
+	}
+	
+	/**
+	 * approve a following request
+	 * @param requestId
+	 * @param tokenValue
+	 * @return
+	 */
+	def allowFollow(requestId,tokenValue){
+		def followRequest = Followers.findById(requestId)
+		def user = userService.getUserAndRoleByAuthToken(tokenValue)?.user
+		if(followRequest == null){
+			int errorCode = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.errorCode
+			int status = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.status
+			String message = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.message
+			String extendedMessage = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.moreInfo
+
+			throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		if(user?.id == followRequest?.followee?.id){
+			followRequest.allowFollowing = true
+			followRequest.requested = false
+			followRequest.save(true)
+			
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+	
+	/**
+	 * delete a following request
+	 * @param requestId
+	 * @param tokenValue
+	 * @return
+	 */
+	def disAllowFollow(requestId,tokenValue){
+		println "disAllowFollow"
+		def user = userService.getUserAndRoleByAuthToken(tokenValue)?.user
+		def followRequest = Followers.findById(requestId)
+		if(followRequest == null){
+			int errorCode = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.errorCode
+			int status = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.status
+			String message = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.message
+			String extendedMessage = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.connection.fourZeroZero.connection.moreInfo
+
+			throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+		if(user?.id == followRequest?.followee?.id || user?.id == followRequest?.follower?.id){
+			followRequest.delete(flush:true)
+		}else{
+			int errorCode = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.errorCode
+			int status = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.status
+			String message = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.message
+			String extendedMessage = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.account.fourZeroOne.notAuthorized.moreInfo
+
+			throw new AccountException(status,errorCode,message,extendedMessage,moreInfo)
+		}
+	}
+    def serviceMethod() {
+
+    }
+}

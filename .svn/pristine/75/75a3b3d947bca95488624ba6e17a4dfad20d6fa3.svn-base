@@ -1,0 +1,154 @@
+app.controller(
+					'GiftCtrl',
+					[
+							'$scope',
+							'$filter',
+							'ngTableParams','$modal','Restangular','configsetting','$routeParams','$location','toaster','$upload','$timeout','$rootScope','$injector',
+							function($scope, $filter, ngTableParams,$modal,Restangular,configsetting,$routeParams,$location,toaster,$upload,$timeout,$rootScope,$injector) {
+							$scope.giftid=$routeParams.giftid
+							
+							$scope.breadCrumb.hideBreadCrumb = false
+							
+							
+							 /* Injector for validation starts */
+							var $validationProvider = $injector.get('$validation');
+							
+						    $scope.giftadd = {
+						            requiredCallback: 'required',
+						            checkValid: $validationProvider.checkValid,
+						            submit: function (form) {
+						                $validationProvider.validate(form);
+						            },
+						            reset: function (form) {
+						                $validationProvider.reset(form);
+						            }
+						        };
+
+						        /* Injector for validation ends */
+						    
+							
+								if($routeParams.giftid=="newgift"){
+									 $scope.edit=true								
+								}else{
+									 $scope.edit=false
+								}
+							$rootScope.breadcrum=[{"name":"Survey","url":"survey"},
+							                      {"name":"SurveyDetails","url":"surveydetails/"+$routeParams.surveyid},
+							                      {"name":"Gift","url":"gift/"+$routeParams.surveyid+"/"+$routeParams.giftid}]
+								$scope.imageuploadfun=function(surveyid,id,type){
+								//	if($scope.imageupload){
+									$scope.upload = $upload.upload({
+								        url: 'api/v1/surveys/'+surveyid+'/gift/'+id+'/uploadImage',
+								        file: $scope.imageupload, 
+								        fileFormDataName: 'myfile',
+								      }).progress(function(evt) {
+								        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+								      }).success(function(data, status, headers, config) {
+								        // file is uploaded successfully
+								    	  if(!data.error && type=="new"){
+													 $location.path("gift/"+$routeParams.surveyid+"/"+id);
+													 toaster.pop('success', "Gift added succesfully");
+												
+								    	  }
+								        console.log(data);
+								      })
+									//}
+									
+								}
+									
+								
+							$scope.questionno=[0,1,2,3,4,5,6,7,8,9]
+								$scope.urlpath={}
+								$scope.urlpath.gift=$scope.environment=="Development"?"surveys/"+$routeParams.surveyid:$scope.staticjsonpath+"/gift.json";
+								 Restangular.one($scope.urlpath.gift).get().then(function (data) {
+						
+									  $scope.gift=data.resp.gift
+									  $scope.survey = data.resp
+									  
+//									  $scope.gift.surveyCode=data.resp.surveyCode
+					
+								  })
+								  
+								  $scope.saveGift=function(validity){
+									 if(validity==true){
+									 if($routeParams.giftid=="newgift"){
+									 Restangular.all("surveys/"+$routeParams.surveyid+"/gift").post({"code":$scope.gift.code,"text":$scope.gift.text,"maxNo": $scope.gift.maxNo == undefined ? null : $scope.gift.maxNo}).then(function (data) {
+										 console.log(data.resp.id)
+										 if($scope.imageupload){
+										 $scope.imageuploadfun($routeParams.surveyid,data.resp.id,'new')	
+										 }else{
+										 $location.path("gift/"+$routeParams.surveyid+"/"+data.resp.id);
+										 toaster.pop('success', "Gift added succesfully");
+										 }
+											
+											},function(data){
+												toaster.pop('error', data.data.message);
+											})
+									 }else{
+										 if($scope.gift.maxNo == "unlimited"){
+											 $scope.gift.maxNo =  undefined
+										 }
+											Restangular.all("surveys/"+$routeParams.surveyid+"/gift/"+$routeParams.giftid).customPUT({"code":$scope.gift.code,"text":$scope.gift.text,"maxNo": $scope.gift.maxNo == undefined ? null : $scope.gift.maxNo}).then(
+													function(data) {
+														$scope.edit=false
+														$scope.gift.maxNo = data.resp.maxNo
+														if($scope.imageupload){
+														$scope.imageuploadfun($routeParams.surveyid,$routeParams.giftid,'edit')	
+														}
+														
+														toaster.pop('success', "Gift updated succesfully");
+													},function(data){
+														toaster.pop('error', data.data.message);
+													}); 
+										 
+									 }
+								 }
+								 }
+							
+								 $scope.deleteGift=function(){
+										Restangular.one("surveys/"+$routeParams.surveyid+"/gift/"+$routeParams.giftid+"/deleteGift").customDELETE().then(function(data){
+										
+											toaster.pop('success',"Gift Deleted Successfully");
+											$location.path("/surveydetails/"+$routeParams.surveyid)
+										},function(data){
+											toaster.pop('error', data.data.message);
+										});
+									 
+								 }
+								 
+								  $scope.onFileSelect = function($files) {
+									    //$files: an array of files selected, each file has name, size, and type.
+									    for (var i = 0; i < $files.length; i++) {
+									      var file = $files[i];
+									      $scope.imageupload=file
+							                var reader = new FileReader();
+							                reader.onload = function (e) {
+							                    $('#giftimage').attr('src', e.target.result);
+							                }
+							                reader.readAsDataURL(file);
+									 /*     $scope.upload = $upload.upload({
+									        url: 'api/v1/gift/2/uploadImage',
+									        data: {myObj: $scope.myModelObj},
+									        file: file, 
+									        fileFormDataName: 'myfile',
+									      }).progress(function(evt) {
+									        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+									      }).success(function(data, status, headers, config) {
+									        // file is uploaded successfully
+									        console.log(data);
+									      });*/
+								
+									    }
+									  
+									  };
+								 
+								$scope.redirectToSurvey = function(giftId){
+									if(giftId == "newgift"){
+										$location.path("/surveydetails/"+$routeParams.surveyid)
+									}else{
+										$scope.edit=false;
+									}
+								}
+								 
+							}])
+							

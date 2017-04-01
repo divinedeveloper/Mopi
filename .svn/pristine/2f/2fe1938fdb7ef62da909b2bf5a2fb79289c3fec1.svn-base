@@ -1,0 +1,132 @@
+package com.themopi.timeline.api
+
+import java.awt.List;
+
+import org.springframework.data.mongodb.core.query.Update.Each;
+
+import grails.converters.JSON
+import grails.transaction.Transactional
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.TimelineException
+import com.themopi.survey.Survey
+import com.themopi.user.Followers
+import com.themopi.user.Timeline
+
+@Transactional
+class TimelineService {
+
+	def userService
+	def surveyService
+    def serviceMethod() {}
+	
+	/*int errorCode = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.errorCode
+	 int status = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.status
+	 String message = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.message
+	 String extendedMessage = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.extendedMessage
+	 String moreInfo = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.moreInfo
+	 */
+	def createCommentSurveyTimeline(request,userId,surveyId)
+	{
+		try
+		{
+			String tokenValue = request.getHeader('X-Auth-Token')
+			UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+			//create timeline
+			def timeline = new Timeline(
+				action:request.getJSON().action,
+				type:request.getJSON().type,
+				isActive:request.getJSON().isActive,
+				dateCreated:new Date(),
+				lastUpdated:new Date()
+				);
+			if(surveyId==null || surveyId.equals(null) || surveyId.equals("null") || surveyId=="null")
+			{
+				// when user follows another user so performedOn will be user (login user)
+				User user = userRole.user;
+				User performedByUser = User.findById(userId);
+				
+				timeline.performedBy=performedByUser
+				
+				timeline.user=performedByUser
+				timeline['performedOn'] = new JSON(user).toString();
+				timeline.performedOnId=userId
+			}
+			else
+			{
+				// when user comment/like a survey so performedOn will be survey
+				User performedByUser = userRole.user;
+				//User user = User.findById(userId);
+				
+				timeline.performedBy=performedByUser
+				timeline.user=performedByUser
+				Survey survey = surveyService.getSurveyById(surveyId)
+				timeline['performedOn'] = new JSON(survey).toString();
+				timeline.performedOnId=surveyId
+			}
+			if(!timeline.save())
+			{
+				return "Not Save"
+			}
+			else
+			{
+				return timeline;
+			}
+		}
+		catch(TimelineException et)
+		{
+			return "Error occuring When saving"
+		}
+		catch(Exception e)
+		{
+			return "Error occuring When saving"
+		}
+	}
+	
+	def getFollowingUserTimeline(request)
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		//find all the user whom login user is following 
+		def followee=Followers.findAllByFollower(user)
+		println "------followee-----s---" + followee
+		println "------followee.followee-----s---" + followee.followee
+		//AndDateCreated
+		//get all timeline for activities performedBy all users been followed by loggedin user (Activity Following screen)
+		/*Presently we will get:
+		 * The users whom loggedin user is following 
+		 * 1. liked a survey
+		 * 2. commented on a survey
+		 * 3. followed someone
+		*/
+		def timeline=Timeline.findAllByPerformedByInList(followee.followee)
+		println "timeline----"+timeline
+		
+		return timeline
+	}
+	
+	def getUserTimeline(request)
+	{
+		String tokenValue = request.getHeader('X-Auth-Token')
+		UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+		User user = userRole.user;
+		//find all the user to who are following login user 
+		def followers=Followers.findAllByFollowee(user)
+		println "------followers-----s---" + followers
+		println "------followers.followers-----s---" + followers.follower
+		//get all timeline for activities performedBy followers of login user (Activity You screen)
+		/*Presently we will get:
+		 * 1. Someone started following you
+		 * 2. From your followers who liked your survey
+		 * 3. From your followers who commented on your survey
+		*/
+		def timeline=Timeline.findAllByPerformedByInList(followers.follower)
+		println "timeline----"+timeline
+		
+		return timeline
+	}
+	
+	
+}

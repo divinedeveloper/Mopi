@@ -1,0 +1,106 @@
+package com.themopi.timeline.api
+
+import grails.converters.JSON
+import grails.transaction.Transactional
+
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.TimelineException
+import com.themopi.survey.Survey
+import com.themopi.user.Timeline
+
+@Transactional
+class TimelineService {
+
+	def userService
+	def surveyService
+    def serviceMethod() {}
+	
+	def createCommentSurveyTimeline(request,userId)
+	{
+		try
+		{
+			println "----i m in createCommentSurveyTimeline------"
+			/*int errorCode = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.errorCode
+			println "errorCode--"+errorCode
+			int status = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.status
+			println "status--"+status
+			String message = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.message
+			println "message---"+message
+			String extendedMessage = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.extendedMessage
+			println "extendedMessage---"+extendedMessage
+			String moreInfo = grailsApplication.config.customExceptions.timeline.fourZeroFour.timeline.moreInfo
+			println "moreInfo----"+moreInfo*/
+			println "-----------------error are ---------------"
+			String tokenValue = request.getHeader('X-Auth-Token')
+			UserRole userRole = userService.getUserAndRoleByAuthToken(tokenValue);
+			User user = userRole.user;
+			User tempUser = User.findById(userId);
+			
+			Survey survey = surveyService.getSurveyById(userId)
+			println "survey---"+survey
+			def timeline = new Timeline(
+				performedBy:user,
+				action:request.getJSON().action,
+				isActive:request.getJSON().isActive,
+				dateCreated:new Date(),
+				lastUpdated:new Date(),
+				user:tempUser
+				);
+			timeline['performedOn'] = survey.getJSON();
+			//timeline['performedOn'] = 'ranjit';
+			if(!timeline.save())
+			{
+				println "not save"
+				return "Not Save"
+			}
+			else
+			{
+				println "---------save"+timeline
+				println "------------"
+				return timeline;
+			}
+		}
+		catch(TimelineException et)
+		{
+			return "Error occuring When saving"
+		}
+		catch(Exception e)
+		{
+			return "Error occuring When saving"
+		}
+	}
+	def createFollowingUserTimeline()
+	{
+		
+	}
+	def createLikeSurveyTimeline()
+	{
+		
+	}
+	def updateCommentSurveyTimeline()
+	{
+		
+	}
+	def updateFollowingUserTimeline()
+	{
+		
+	}
+	def updateLikeSurveyTimeline()
+	{
+		
+	}
+	def getCommentSurveyTimeline()
+	{
+		
+	}
+	def getFollowingUserTimeline()
+	{
+		
+	}
+	def getLikeSurveyTimeline()
+	{
+		
+	}
+	
+}

@@ -1,0 +1,18 @@
+.app .pac-container {
+	z-index:999999;
+}
+.validation-valid {
+    color: #0074D9;
+}
+.validation-invalid {
+    color: #FF4136;
+}
+select {
+   -moz-appearance: window; 
+   -moz-background-position: -9999px -9999px!important;
+    text-indent: 0.01px;
+    text-overflow: '';
+}
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}

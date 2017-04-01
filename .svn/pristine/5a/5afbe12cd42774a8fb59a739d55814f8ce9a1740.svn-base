@@ -1,0 +1,246 @@
+
+<div class="page" ng-controller="UserProfileCtrl">
+
+	<section class="panel panel-default table-dynamic"
+		style="margin-top: 2%;">
+
+
+		<div class="panel-heading">
+
+			<div class="row">
+				<div class="col-md-2">
+					<strong><i class="ti-user"></i> User Details</strong>
+				</div>
+				<div class="col-md-2 col-md-offset-6">
+
+	<span ng-show="userstatus=='created' && !(authenticationfunction(['ROLE_SUPERADMIN']) && user.id==userdata.resp.id)" class="ui-select" > 
+					<select class="form-control" ng-change="changestatus(user)" chosen disable-search="true"
+										ng-model="user.status"
+										ng-options="stat.status as stat.name for stat in statususer">
+										<option value=""></option>
+									</select>
+					</span>
+				</div>
+			</div>
+		</div>
+<div class="panel-body">
+<form class="form-horizontal" role="form" name="createuser">
+		<div class="row">
+			<div class="col-md-4 col-md-offset-1">
+				<div class="" ng-file-select="onFileSelect($files)" style="margin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+					<img id="userimage" src="images/assets/600_400-2.jpg" alt=""  ng-src="{{user.imageUrl}}" style="height: 172px;">
+
+				</div>
+			</div>
+
+			<div class="col-md-7" style="margin-top: 30px;">
+				<!--                                            <div class="row"  style="margin-top: 30px;"> -->
+
+					<div class="form-group">
+					<div class="col-sm-10"  ng-show="!edit">
+					<label for="inputEmail3" class="col-md-10" ng-show="user.name">Name: {{user.name}}</label>
+					<label for="inputEmail3" class="col-md-10" ng-show="!user.name || user.name==null">Name: </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+							
+
+ <input type="text" ng-model="user.name" class="form-control" id="inputEmail3"  placeholder="Name" name="requireWatch" validator="required" required-error-message="Please enter name!!" valid-method="submit-only">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-10" ng-show="!edit">
+							<label for="inputEmail3" class="col-md-10 " ng-show="user.email">Email: {{user.email}}</label>
+							<label for="inputEmail3" class="col-md-10 " ng-show="!user.email || user.email==null">Email: </label>
+						</div>
+						<div class="col-sm-10" ng-show="edit">
+						
+
+<input type="email" ng-model="user.email" class="form-control" id="inputEmail3"  placeholder="Email" name="requireWatch" validator="email" email-error-message="Please enter valid email!!" valid-method="submit-only">
+						<span ng-show="emailexist" class="validation-invalid">Email already exist!!</span>
+						</div>
+					</div>
+					<div class="form-group">
+					<div class="col-sm-10" ng-show="!edit">
+					<label for="inputEmail3" class="col-sm-10 " ng-show="user.password">Password: pass***</label>
+					<label for="inputEmail3" class="col-sm-10 " ng-show="!user.password || user.password==null">Password: </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+<input ng-if="userstatus=='created'" type="password" ng-model="user.password" class="form-control" id="inputPassword3"  placeholder="Password" name="requireWatch">
+<input ng-if="userstatus=='new'" type="password" ng-model="user.password" class="form-control" id="inputPassword3"  placeholder="Password" name="requireWatch" validator="required" required-error-message="Please enter password!!" valid-method="submit-only">
+						</div>
+					</div>
+
+					<div class="form-group">
+					<div class="col-sm-10" ng-show="!edit">
+					<label for="inputEmail3" class="col-sm-10 " ng-show="user.homeTown">HomeTown :{{user.homeTown}}</label>
+		<label for="inputEmail3" class="col-sm-10 " ng-show="!user.homeTown || user.homeTown==null">HomeTown : </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+							
+
+<input type="text" id="Autocomplete2" ng-model="user.homeTown" name="location" class="form-control"  ng-autocomplete options="options" details="details" placeholder="Hometown" required />
+						<span ng-show="createuser.location.$error.required && submitted" class="validation-invalid">Please Select Hometown!!</span>
+						</div>
+					</div>
+					<div class="form-group">
+					<div class="col-sm-10" ng-show="!edit">
+					<label for="inputEmail3" class="col-sm-10 " ng-show="user.description">Description: {{user.description}}</label>
+					<label for="inputEmail3" class="col-sm-10 " ng-show="!user.description || user.description==null">Description: </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+							
+<textarea rows="4" class="form-control" ng-model="user.description" placeholder="Decription"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+					<div class="col-sm-10" ng-show="!edit">
+					<label for="inputEmail3" class="col-sm-10 " ng-show="user.mobile">Mobile: {{user.mobile}}</label>
+					<label for="inputEmail3" class="col-sm-10 " ng-show="!user.mobile || user.mobile==null">Mobile: </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+							
+<input type="number" class="form-control" ng-model="user.mobile" name="mobile" phonenumber id="inputPassword3" ng-minlength="10"  placeholder="Mobile Number">
+             <span ng-show="createuser.mobile.$error.minlength" class="validation-invalid">Valid 10 Digit Number is required!!</span>
+						</div>
+					</div>
+
+
+
+				<!--                         </div> -->
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="col-sm-4 col-md-offset-1">
+
+					<div class="form-group">
+						<!--                             <label for="inputEmail3" class="col-sm-2 control-label">Role Type</label> -->
+						<div class="col-sm-10" ng-show="!edit">
+					<label ng-show="user.roleId && userstatus=='created'">Role: {{user.roleDisplay}}</label>
+					<label ng-show="userstatus=='created' && !user.roleId || user.roleId==null ">Role: </label>		
+						</div>
+						<div class="col-sm-10" ng-show="userstatus=='new'">
+				  <select class="form-control" name="roles" data-placeholder="Role" chosen ng-model="user.roleId" ng-options=" role.id as role.displayAuthority for role in rolelist" required>
+                            <option value=""></option>
+                         
+                        </select>
+                        <span ng-show="submitted==true && !user.roleId && createuser.roles.$error.required" class="validation-invalid">Please Select Role!!</span>
+						</div>
+					</div>
+					<div class="form-group">
+						<!--                             <label for="inputEmail3" class="col-sm-2 control-label">Role Type</label> -->
+					<div class="col-sm-10" ng-show="!edit">
+					<label ng-show="user.incomeLevel">Income Level :{{user.incomeLevel}}</label>
+					<label ng-show="!user.incomeLevel || user.incomeLevel==null">Income Level :</label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+					  <select class="form-control" data-placeholder="Income-Level" chosen ng-model="user.incomeLevel" ng-options=" inc.incomes as inc.incomes for inc in incomegroup">
+						  <option value=""></option>
+                      </select>
+						</div>
+					</div>
+					<div class="form-group" >
+						        <div class="col-sm-10" ng-show="!edit">
+						        <label ng-show="user.age">Age: {{user.age}}</label>
+						        <label ng-show="!user.age || user.age==null">Age: </label>
+						        </div>
+<!-- 						        <label for="inputEmail3" class="col-sm-1 control-label"  ng-show="edit"><i class="ti-calendar"></i></label> -->
+						<div class="col-sm-10" ng-show="edit">
+ 
+<!-- 		<input type="text" class="form-control" data-date-format="yyyy-MM-dd" data-container="body" ng-model="user.dob" name="date" bs-datepicker> -->
+  <select class="form-control" data-placeholder="Age" chosen ng-model="user.age" ng-options=" ageg.name as ageg.name for ageg in agegroup">
+                            <option value=""></option>
+                      
+                          
+                        </select>
+<!-- 							</div> -->
+						</div>
+					</div>
+
+			</div>
+			<div class="col-sm-5">
+
+					<div class="form-group">
+					<div class="col-sm-10" ng-show="!edit">
+					<label ng-show="user.gender">Gender: {{user.gender}}</label>
+					<label ng-show="!user.gender || user.gender==null">Gender: </label>
+					</div>
+<!-- 					 <label for="inputEmail3" class="col-sm-2 control-label"></label> -->
+						<div class="col-sm-10" ng-show="edit">
+							  <select class="form-control" data-placeholder="Gender" chosen ng-model="user.gender" ng-options=" g.name as g.name for g in genders">
+                            <option value=""></option>                          
+                        </select>
+						</div>
+					</div>
+					<div class="form-group">
+				<!--                             <label for="inputEmail3" class="col-sm-2 control-label">Role Type</label> -->
+				<div class="col-sm-10" ng-show="!edit">
+				<label ng-show="user.religion">Religion :{{user.religion}}</label>
+				<label ng-show="!user.religion || user.religion==null">Religion :</label>
+				</div>
+						<div class="col-sm-10" ng-show="edit">
+							<select class="form-control" data-placeholder="Religion" chosen ng-model="user.religion" ng-options=" relg.name as relg.name for relg in relegions">
+                   <option value=""></option>
+  
+                        </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<!--                             <label for="inputEmail3" class="col-sm-2 control-label">Role Type</label> -->
+					<div class="col-sm-10" ng-show="!edit">
+					<label ng-show="user.occupation">Occupation: {{user.occupation}}</label>
+					<label ng-show="!user.occupation || user.occupation==null">Occupation: </label>
+					</div>
+						<div class="col-sm-10" ng-show="edit">
+	<select class="form-control" data-placeholder="Occupation" ng-model="user.occupation" chosen  ng-options="occup.name as occup.name for occup in occupations">
+	 			<option value=""></option>
+             </select>
+						</div>
+					</div>
+
+			</div>
+		</div>
+		<div class="row">
+
+			<div class="col-sm-4 col-md-offset-2">
+				<button class="btn btn-w-md btn-gap-v btn-danger" type="button" ng-show="edit" ng-click="edit=false;">Cancel</button>
+<!-- 				<button class="btn btn-w-md btn-gap-v btn-danger" type="button" ng-show="userstatus=='created' && !edit" ng-click="deleteuser(user.id)">Delete</button> -->
+			</div>
+			<div class="col-sm-4">
+				<button ng-show="edit" class="btn btn-w-md btn-gap-v btn-success"
+					type="button" ng-click="submitted=true;useradd.submit(createuser);registeruser(user,details,useradd.checkValid(createuser));">Save</button>
+				<button ng-show="!edit && authenticationfunction(['ROLE_SUPERADMIN']) ||!edit && user.id==userdata.resp.id"  class="btn btn-w-md btn-gap-v btn-success"
+					type="button" ng-click="edit=true">Edit</button>
+			</div>
+		</div>
+		</form>
+	</div>
+	
+	</section>
+
+	<div class=" page-table" ng-show="userstatus=='created' && authenticationfunction(['ROLE_SPONSEREDADMIN','ROLE_SUPERADMIN']) && user.roleId != 1">
+
+		<section class="panel panel-default table-dynamic">
+			<div class="panel-heading">
+				<strong><span class="glyphicon glyphicon-th"></span>Survey</strong>
+				<span class="pull-right" ng-if="authenticationfunction(['ROLE_SPONSEREDADMIN'])"><a href="#/surveydetails/newsurvey" > Add New Survey</a></span>
+			</div>
+			                    <tabset class="ui-tab">
+                        <tab ng-repeat="tab in tabs"  select="current(tab.title)" active="tab.active" disabled="tab.disabled">
+                            
+                             <tab-heading>
+                            <div class="tab_text">
+                                {{tab.title}}</div>
+                        </tab-heading>
+                        <div ng-if="(tabs |filter:true)[0].pageurl==tab.pageurl">
+                            <div ng-include="tab.pageurl"></div>
+                            </div>
+                        </tab>
+
+                    </tabset>
+
+		</section>
+		</div>
+
+
+	</div>

@@ -1,0 +1,308 @@
+<div class="page page-surveydetails" ng-controller="SurveydetailsCtrl">
+	<section class="panel panel-default table-dynamic">
+
+		<div class="panel-heading">
+
+			<div class="row">
+				<div class="form-group col-md-4">
+					<strong><span class="ti-notepad" style="padding-right: 6px;"></span>Survey Details</strong>
+					
+				</div>
+				<div class="form-group col-md-4" ng-show="surveystatus=='created'">
+					<span class="label label-danger">{{survey.surveyFlaggedCount}}</span>
+					Flags
+				</div>
+				<div class="form-group col-md-4" ng-show="surveystatus=='created'">
+<!-- 					<span ng-show="surveystatus=='created'" >  -->
+					<select
+						class="form-control" ng-change="changeStatus()" chosen
+						disable-search="true" ng-model="survey.status"
+						ng-options="stat.status as stat.name for stat in (authenticationfunction(['ROLE_SPONSEREDADMIN','ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='Active'  && (status | filter:{status:'!Draft'} | filter:{status:'!flagged'} | filter:{status:'!Autohidden'})|| authenticationfunction(['ROLE_SPONSEREDADMIN']) && survey.status=='Draft'  && (status | filter:{status:'!hidden'} | filter:{status:'!flagged'})|| authenticationfunction(['ROLE_SPONSEREDADMIN']) && (survey.status=='flagged' || survey.status=='Autohidden')  && (status | filter:{status:survey.status})|| authenticationfunction(['ROLE_SPONSEREDADMIN']) && (survey.status=='hidden')  && (status | filter:{status:'!Draft'} | filter:{status:'!Active'} | filter:{status:'!flagged'} | filter:{status:'!Autohidden'})|| authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='Draft'  && (status | filter:{status:'Draft'})|| authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='flagged'  && (status | filter:{status:'!Draft'} | filter:{status:'!Autohidden'})|| authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='hidden'  && (status  | filter:{status:'!Draft'} | filter:{status:'!flagged'} | filter:{status:'!Autohidden'})|| authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='Autohidden'  && (status  | filter:{status:'!Draft'} | filter:{status:'!flagged'})|| status) "> 
+							<option value=""></option>
+					</select>
+
+<!-- 		<select -->
+<!-- 						class="form-control" ng-change="changeStatus()" chosen -->
+<!-- 						disable-search="true" ng-model="survey.status" -->
+<!-- 						ng-options="stat.status as stat.name for stat in (authenticationfunction(['ROLE_SPONSEREDADMIN','ROLE_SUPERADMIN','ROLE_ADMIN']) && survey.status=='Active'  && (status | filter:{status:'!Draft'} | filter:{status:'!flagged'} | filter:{status:'!Autohidden'})|| authenticationfunction(['ROLE_SPONSEREDADMIN']) && survey.status=='Draft'  && (status | filter:{status:'!hidden'} | filter:{status:'!flagged'}) || status) "> -->
+<!-- 							<option value=""></option> -->
+<!-- 					</select> -->
+
+
+<!-- 					</span> -->
+				</div>
+			</div>
+		</div>
+		<div class="panel-body form-group col-md-offset-1">
+			<form name="Form">
+				<div class="row">
+					<div class="form-group col-md-4 ">
+						<div class="" ng-if="edit" ng-file-select="onFileSelect($files)" style="margin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+							<img id="giftimage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+" alt="" ng-src="{{survey.imageUrl}}" style="height: 172px;width:172px">
+
+						</div>
+						<div class="" ng-if="!edit" style="marsgin-top: 30px; border-bottom-width: 30px; margin-bottom: 30px;">
+							<img id="giftimage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjZWVlIi8+PHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIiIHk9IjMyIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9zdmc+" alt="" ng-src="{{survey.imageUrl}}" style="height: 172px;width:172px">
+
+						</div>
+					</div>
+
+					<div class="form-group col-md-7" style="margin-top: 30px;">
+
+						<div class="form-group">
+							<div class="row" ng-show="surveystatus=='created'">
+								<div class="form-group col-sm-10">
+
+									<label for="inputEmail3" class="form-group col-md-10" ng-show="!edit">Survey Code: {{survey.surveyCode}}</label>
+
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+
+									<label for="inputEmail3" class="form-group col-md-10" ng-show="!edit">Survey Name: {{survey.name}}</label>
+									<span ng-show="edit && (survey.status !='Active' && survey.status !='flagged')"><input
+										type="text" class=" form-control" ng-model="survey.name"
+										id="inputPassword3" placeholder="Survey Name"
+										name="requireWatch" validator="required"
+										required-error-message="Survey name is required"
+										autofocus="autofocus"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+								    
+									<label for="inputEmail3" class="form-group col-md-10 " ng-show="!edit">Hash tags:<span
+										ng-repeat="data in survey.tags" ng-show="survey.tags.length>0"> #{{data.text}}<span ng-if="survey.tags.length != $index+1">,</span></span>
+										<span ng-show="survey.tags.length==0">Hash tags: No Hash Tags</span> </label> <span
+										ng-show="edit"> <tags-input ng-model="survey.tags"
+											class="ui-tags-input"> <auto-complete
+											source="loadTags($query)"></auto-complete></tags-input>
+									</span>
+								</div>
+							</div>
+							
+							<div class="row">
+
+								<div class="form-group col-sm-5">
+									<label ng-show="!edit" class="form-group col-md-10 "> Visible To:
+								<span ng-show="survey.visibleTo=='EveryOne'">Public</span> <span
+										ng-show="survey.visibleTo=='Followers'">Followers</span>
+									</label>
+									 <span ng-show="edit && (survey.status!='Active' && survey.status !='flagged')">
+									<select class="form-control" chosen disable-search="true"
+										ng-model="survey.visibleTo" data-placeholder="Visible To"
+										ng-options="visible.value as visible.name for visible in visibleto">
+											<option value=""></option>
+									</select> 
+									</span>
+								</div>
+								
+								<div class="form-group col-sm-5">
+									<label ng-show="!edit" class="form-group col-md-10 "> Show Results:
+										<span ng-show="survey.visibility==true">Yes</span> <span
+										ng-show="survey.visibility==false">No</span>
+									</label>
+									 <span ng-show="edit && (survey.status!='Active' && survey.status !='flagged')"><select
+										class="form-control" chosen disable-search="true"
+										ng-model="survey.visibility" data-placeholder="Show Results?"
+										ng-options="result.value as result.name for result in showResults">
+											<option value=""></option>
+									</select> </span>
+								</div>
+
+							</div>
+							
+							<div class="row">
+								<div class="form-group col-sm-10">
+									<label for="inputEmail3" class="form-group col-sm-10 " ng-show="!edit">Country:<span
+										ng-repeat="data in survey.countryWithLocation"
+										ng-show="survey.countryWithLocation.length>0"> #{{data.name}}<span ng-if="survey.countryWithLocation.length != $index+1">,</span></span> <span
+										ng-show="survey.countryWithLocation.length==0 || survey.countryWithLocation==null">No
+											Country Tags</span> </label> <span ng-show="edit && (survey.status!='Active' && survey.status !='flagged')">
+									<tags-input
+											placeholder="Select Country" ng-model="survey.countrytag"
+											class="ui-tags-input"> <auto-complete
+											source="loadcountries($query)"></auto-complete></tags-input>
+											
+											</span>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+
+				</div>
+				
+				<div class="row">
+
+					<div class="form-group col-sm-10">
+
+						<div>
+							<label class="form-group col-sm-10 " ng-show="!edit">City:<span ng-show="!edit" ng-repeat="data in survey.cityWithLocation"
+								ng-show="survey.cityWithLocation.length>0"> #{{data.name}}<a
+									ng-show="$last==false">,</a></span><span
+								ng-show="survey.cityWithLocation.length==0|| survey.cityWithLocation==null">No
+									city Tags</span></label>
+						
+							<div ng-show="edit && (survey.status!='Active' && survey.status !='flagged')"  class="ui-tags-input">
+							<div  class="tags" ng-click="setfocus()">
+								<ul class="tag-list">
+									<!-- ngRepeat: tag in tagList.items track by track(tag) -->
+									<li class="tag-item " ng-repeat="data in survey.cityWithLocation"><span>{{data.name}}</span>
+										<a class="remove-button ti-close" style="font-size: 9px;" ng-click="survey.cityWithLocation.splice($index,1)"></a></li>
+								</ul>
+								<input ng-model="user.location" id="focusset" ng-autocomplete
+								options="options" details="details"   placeholder="Select City"
+									class="input"
+									><span class="input"
+									style="visibility: hidden; width: auto; white-space: pre; display: none;">Select
+									City</span>
+							</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+				
+				<div class="row">
+
+
+					<div class="form-group">
+						<div class="form-group col-sm-4">
+							<label for="datepickerbegin" class="form-group col-sm-4 control-label">Begin
+								on</label>
+							<div class="input-group ui-datepicker" id="datepickerbegin">
+								<input type="text" ng-model="survey.startTime" ng-change="setenddate(survey.startTime)"
+									datepicker-popup="yyyy-MM-dd" data-container="body" data-type="string"
+									data-min-date="today" class="form-control" name="date"
+									data-autoclose="true"
+									ng-disabled="!edit || survey.status =='Active' || survey.status =='flagged'" bs-datepicker>
+							</div>
+
+						</div>
+						<div class="form-group col-sm-4">
+							<label for="datepickerend" class="form-group col-sm-4 control-label">End
+								on</label>
+							<div id="datepickerend" class="input-group ui-datepicker">
+								<input type="text" ng-model="survey.endTime"
+									data-min-date="{{survey.emindate}}" data-type="string"
+									datepicker-popup="yyyy-MM-dd" data-container="body"
+									class="form-control" name="date" data-autoclose="true"
+									ng-disabled="!survey.startTime || survey.status =='Active' || !edit || survey.status =='flagged'"
+									bs-datepicker>
+							</div>
+
+						</div>
+			<div class="form-group col-sm-4"
+							ng-show="surveystatus=='created'">
+							<a ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN']) &&(!(survey.status !='Draft' && !(survey.gift.id)))" href="#gift/{{surveyid}}/{{survey.gift?survey.gift.id:'newgift'}}">Gifts</a>
+							<a  ng-show="authenticationfunction(['ROLE_SUPERADMIN']) && survey.gift.id" href="#gift/{{surveyid}}/{{survey.gift?survey.gift.id:'newgift'}}">Gifts</a>
+						</div>
+
+
+
+					</div>
+
+
+				</div>
+				
+				<div class="row" ng-show="surveystatus=='created'">
+					<div class="form-group col-md-4 form-group" ng-show="authenticationfunction(['ROLE_SUPERADMIN','ROLE_ADMIN'])">
+						<span class="label label-danger">{{survey.commentFlaggedCount}}</span>
+						<a href="#comments/{{surveyid}}" > Comments Flagged</a>
+			
+					</div>
+					<div class="form-group col-md-4 form-group" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN'])">
+						<span class="label label-danger">{{survey.commentCount}}</span>
+						<a href="#comments/{{surveyid}}"> Comments on Survey</a>
+					</div>
+					
+				</div>
+				
+				<div class="row text-center">
+
+
+
+					<button ng-show="edit" class="btn btn-w-md btn-gap-v btn-success"
+						type="button"
+						ng-click="form.submit(Form);createSurvey(form.checkValid(Form))">Save</button>
+					<button ng-show="!edit && authenticationfunction(['ROLE_SPONSEREDADMIN']) && (survey.status =='Active' || survey.status =='Draft' || survey.status =='flagged')" ng-click="edit=true"
+						class="btn btn-w-md btn-gap-v btn-success">Edit</button>
+					<button ng-show="edit" ng-click="redirectTo(surveystatus)"
+						class="btn btn-w-md btn-gap-v btn-info">Cancel</button>
+
+				</div>
+
+			</form>
+		</div>
+
+	</section>
+
+	<section
+		ng-show="surveystatus=='created' && authenticationfunction(['ROLE_SUPERADMIN','ROLE_SPONSEREDADMIN'])"
+		class="panel panel-default table-dynamic" style="margin-top: 2%;">
+		<div class="panel-heading" style="min-height: 40px;">
+			<div class="form-group col-md-4 form-group">
+				<strong><span class="ti-notepad" style="padding-right: 6px;"></span> Survey
+					Question(Max 15)</strong>
+			</div>
+
+			<div class="form-group col-md-4 form-group" ng-show="survey.questionList.length>0 && survey.responses !=0">
+				<a href="" click-link="surveychartdetails/{{surveyid}}">Summary</a>
+			</div>
+			<div class="form-group col-md-4 form-group" style="margin-top: -6px;" ng-show="authenticationfunction(['ROLE_SPONSEREDADMIN']) && (survey.status !='Active' && survey.status !='flagged')">
+				<button class="btn btn-info  btn-sm"
+					click-link="question/newquestion/{{surveyid}}">
+					<span class="ti-plus"></span>Add Question
+				</button>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="form-group">
+					<div class="form-group col-sm-12">
+<div class="table-responsive">
+						<table class="table table-hover table-bordered table-striped">
+
+							<tbody>
+								<tr ng-repeat="data in survey.questionList"
+									ng-click="questionredirect(authenticationfunction(['ROLE_SPONSEREDADMIN']),data.id,surveyid,survey.status)">
+									<td>{{$index+1}}</td>
+									<td>{{data.name}}</td>
+									<td>{{data.responseCount}} Responses</td>
+									<td>
+										<div ng-if="data.questionType=='multiplechoice'"
+											class="icon-container">
+											<span class="ti-check-box"></span>MCQ
+										</div>
+										<div ng-if="data.questionType=='binary'"
+											class="icon-container">
+											<span class="icon-circle-full"></span> Binary
+										</div>
+										<div ng-if="data.questionType=='text'" class="icon-container">
+											<span class="ti-comment-alt"></span> Text
+										</div>
+										<div ng-if="data.questionType=='scale'" class="icon-container">
+											<span class="ti-layout-slider"></span> Slider
+										</div>
+									</td>
+									<td ng-if="authenticationfunction(['ROLE_SPONSEREDADMIN']) && !(survey.status =='Active' || survey.status =='flagged')"><button class="btn btn-w-md btn-gap-v btn-danger"
+		ng-click="deleteQuestion(data.id); $event.stopPropagation();" type="button">Delete</button></td>
+								</tr>
+
+							</tbody>
+						</table>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+</div>

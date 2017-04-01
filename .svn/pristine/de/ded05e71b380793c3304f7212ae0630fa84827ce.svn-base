@@ -1,0 +1,96 @@
+package com.themopi.account
+
+import java.util.Map;
+
+import com.themopi.survey.Gift
+import com.themopi.user.*
+import com.themopi.user.Profile
+
+
+/**
+ * @author nisos
+ * This Domain Class contains the user account information
+ */
+class User {
+
+	transient springSecurityService
+
+	String username,name,authToken,gPlusAuthToken,gPlusRefreshToken,tokenValue
+	String password,fbUID
+	String email
+	String roleAuthority
+	String salt
+	
+	Long roleId
+	
+	
+	boolean fbLogin,gPlusLogin,isActive
+	boolean enabled = true
+	boolean accountExpired
+	boolean accountLocked
+	boolean passwordExpired
+	boolean isEligibleForGift = false
+	
+	Date lastUpdated
+	Date dateCreated
+	Date deletedAt
+
+	Profile profile
+	Address address
+	List<Gift> gift
+	
+	int surveyCount = 0
+	
+	static transients = ['springSecurityService']
+	static embedded = ['address','profile','gift']
+	static hasMany = [gift:Gift,followers:Followers]
+
+	static constraints = {
+		username blank: false, unique: true
+		password blank: false
+		name blank:false
+		authToken nullable:true
+		gPlusAuthToken nullable:true
+		gPlusRefreshToken nullable:true
+		fbUID	nullable:true
+		email	blank:false ,email:true , unique: true
+		deletedAt nullable:true
+		fbLogin nullable:true
+		gPlusLogin nullable:true
+		tokenValue nullable:true
+		address nullable:true
+		profile nullable:true
+		roleAuthority nullable:true
+		roleId nullable:true
+			
+	}
+
+	static mapping = {
+
+		password column: '`password`'
+	}
+
+	Set<Role> getAuthorities() {
+		UserRole.findAllByUser(this).collect { it.role }
+	}
+
+	String getSalt() {
+		if (!this.salt) {
+			this.salt = this.email
+		}
+		this.salt
+	}
+	/*def beforeInsert() {
+		encodePassword()
+	}*/
+
+/*	def beforeUpdate() {
+		if (isDirty('password')) {
+			encodePassword()
+		}
+	}*/
+
+	/*protected void encodePassword() {
+		password = springSecurityService?.passwordEncoder ? springSecurityService.encodePassword(password) : password
+	}*/
+}

@@ -1,0 +1,32 @@
+Testsuite: com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.374 sec
+------------- Standard Output ---------------
+--Output from test should upload profile image for a user and give image url in success response--
+stringValue---HShzh
+emailValue--dJuUi@rkgtechllc.com
+--------------ggg----------stringValue--------1Vq0j
+user created is com.themopi.account.User : 99
+user id is 99
+userIdT---99
+Using just named arguments
+{
+    "user": {
+        "userId": 99
+    }
+}
+testFile is C:\Users\nisosadmin\Downloads\zooplaImg.png
+file object is org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile@70d153ea
+username ===== 1Vq0j
+1Vq0j
+username  ============ 1Vq0j
+username  ============ com.themopi.account.User : 99
+user ===== 1Vq0j@mopi.com
+null
+0000null
+response is [error:false, resp:[:]]
+------------- ---------------- ---------------
+------------- Standard Error -----------------
+--Output from test should upload profile image for a user and give image url in success response--
+------------- ---------------- ---------------
+
+Testcase: test should upload profile image for a user and give image url in success response took 1.373 sec

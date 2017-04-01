@@ -1,0 +1,69 @@
+app.controller('LoginCtrl',['$scope', '$http','$environment', 'Restangular','$rootScope','$location','$injector','$timeout','ipCookie','toaster',function($scope,$http,$environment,Restangular,$rootScope,$location,$injector,$timeout,ipCookie,toaster)
+                            {
+	
+	delete $http.defaults.headers.common['X-Auth-Token']
+
+	console.log(ipCookie('logininfo')); 
+	 /* Injector for validation starts */
+	var $validationProvider = $injector.get('$validation');
+	
+    $scope.loginvalidation = {
+            requiredCallback: 'required',
+            checkValid: $validationProvider.checkValid,
+            submit: function (form) {
+                $validationProvider.validate(form);
+            },
+            reset: function (form) {
+                $validationProvider.reset(form);
+            }
+        };
+
+        /* Injector for validation ends */
+	
+    
+    
+	/* Login function starts */
+	$scope.login=function(data,validity){
+		console.log(data)
+		if(validity==true){
+//		Restangular.allUrl(temp+'login').post(data).then(function (data,status) {
+//			ipCookie('logininfo', data)
+//			
+//			$timeout(function () {
+//				$location.path('/dashboard')
+//				
+//			},500);
+		/*	console.log($httpProvider.defaults.headers['Date'])*/
+			
+		//});
+			
+			$http({method: 'POST', url: $environment.loginurl+'login', data:data}).
+			success(function(data, status, headers, config) {
+				console.log(data.roles)
+				ipCookie('logininfo', data)	
+				   	$http.defaults.headers.common['X-Auth-Token']=ipCookie('logininfo').access_token
+				   	$http.defaults.headers.common['Content-Type']="application/json"
+					
+	Restangular.one('users/loggedInUser').get().then(function (value) {
+        		 $rootScope.userdata=value        
+        			if(data.roles[0]=="ROLE_SUPERADMIN"){
+        				$location.path('/dashboard')
+        				}else if(data.roles[0]=="ROLE_SPONSEREDADMIN"){
+        					$location.path('/userprofile/'+$rootScope.userdata.resp.id)
+        				}else if(data.roles[0]=="ROLE_ADMIN"){
+        					$location.path('/survey')
+        				}
+        		
+   		  })
+			
+		  	}).error(function(data, status, headers, config) {
+		 
+		  		if(status==401){
+		    		toaster.pop('error', "Login", "Invalid Email Id or Password");
+		  		}
+		  	});
+		}
+	}
+	
+	/* Login function ends */
+}]);

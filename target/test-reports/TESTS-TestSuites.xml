@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite errors="0" failures="0" hostname="nisostech-26Q" id="0" name="ProfileimageuploadControllerIntegrationSpec" package="com.mopi.imageupload" tests="1" time="1.374" timestamp="2014-12-09T07:19:40">
+      <properties />
+
+      <testcase classname="com.mopi.imageupload.ProfileimageuploadControllerIntegrationSpec" name="test should upload profile image for a user and give image url in success response" time="1.373" />
+
+      <system-out><![CDATA[--Output from test should upload profile image for a user and give image url in success response--
+stringValue---HShzh
+emailValue--dJuUi@rkgtechllc.com
+--------------ggg----------stringValue--------1Vq0j
+user created is com.themopi.account.User : 99
+user id is 99
+userIdT---99
+Using just named arguments
+{
+    "user": {
+        "userId": 99
+    }
+}
+testFile is C:\Users\nisosadmin\Downloads\zooplaImg.png
+file object is org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile@70d153ea
+username ===== 1Vq0j
+1Vq0j
+username  ============ 1Vq0j
+username  ============ com.themopi.account.User : 99
+user ===== 1Vq0j@mopi.com
+null
+0000null
+response is [error:false, resp:[:]]
+]]></system-out>
+
+      <system-err><![CDATA[--Output from test should upload profile image for a user and give image url in success response--
+]]></system-err>
+
+  </testsuite>
+</testsuites>

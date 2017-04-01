@@ -1,0 +1,11 @@
+package com.themopi.usermanagement
+
+class VerificationToken {
+	
+	String email , verificationToken
+
+    static constraints = {
+		email email:true,blank:false
+		verificationToken blank:false
+    }
+}

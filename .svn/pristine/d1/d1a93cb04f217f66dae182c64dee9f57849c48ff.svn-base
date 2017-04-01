@@ -1,0 +1,224 @@
+app.controller('QuestionCtrl', [
+		'$scope',
+		'ngTableParams',
+		'$routeParams',
+		'Restangular',
+		'tags',
+		'$location','$injector','$filter','toaster','$upload',
+		function($scope, ngTableParams, $routeParams, Restangular, tags,$location,$injector,$filter,toaster,$upload) {
+		
+			
+			/*Question Image Upload function starts*/
+			$scope.questionimageuploadfun=function(surveyid,questionid,type){
+				//if($scope.imageupload){
+				$scope.upload = $upload.upload({
+			        url: 'api/v1/surveys/'+surveyid+'/question/'+questionid+'/uploadImage',
+			        file: $scope.imageupload, 
+			        fileFormDataName: 'myfile',
+			      }).progress(function(evt) {
+			        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+			      }).success(function(data, status, headers, config) {
+			        // file is uploaded successfully
+			    	  if(!data.error && type=="new"){
+			    		  $location.path("question/"+questionid+"/"+surveyid)
+			    		  toaster.pop('success', "Question", "Question added succesfully");
+							
+			    	  }
+			        console.log(data);
+			      })
+				//}
+				
+			}
+			
+			/*Question Image Upload function ends*/
+			
+			/*File select for image uploading starts*/
+			  $scope.onFileSelect = function($files) {
+				  console.log($files)
+				    //$files: an array of files selected, each file has name, size, and type.
+				    for (var i = 0; i < $files.length; i++) {
+				      var file = $files[i];
+				      $scope.imageupload=file
+		                var reader = new FileReader();
+		                reader.onload = function (e) {
+		                    $('#giftimage').attr('src', e.target.result);
+		                }
+		                reader.readAsDataURL(file);			
+				    }
+				  
+				  };
+				  /*File select for image uploading ends*/
+			
+			 $scope.updatefunction=function(surveyid,postdata,questionid){
+			    
+			    	
+			    	if(questionid=="newquestion"){
+			        return  Restangular.all("surveys/"+surveyid+"/questions").post(postdata).then(function (data) {
+			        	
+			        	console.log(data)
+			        	if($scope.imageupload){
+			        	$scope.questionimageuploadfun(surveyid,data.resp.id,'new')
+			        	}else{
+			        		toaster.pop('success', "Question", "Question added succesfully");
+			        		$location.path("question/"+data.resp.id+"/"+surveyid)
+			        	}
+			        	
+					  })
+			    	}else{
+			    		return Restangular.all("surveys/"+surveyid+"/questions/"+questionid).customPUT(postdata).then(
+								function(data) {
+									$scope.questionimageuploadfun(surveyid,questionid,'edit')
+									toaster.pop('success', "Question", "Question updated succesfully");
+								},function(){});	
+			    		
+			    	}
+			 }
+			
+			
+			$scope.question=[{"name":"Binary","pageurl":"static/partials/binaryquestion.html","bindname":"binary","id":0},
+			                 {"name":"Slider","pageurl":"static/partials/sliderquestion.html","bindname":"scale","id":1},
+			                 {"name":"MCQ","pageurl":"static/partials/mcqquestion.html","bindname":"multiplechoice","id":2},
+			                 {"name":"Comment","pageurl":"static/partials/commentquestiontype.html","bindname":"text","id":3}]
+			
+			$scope.questionid=$routeParams.questionid;
+			if($scope.questionid!="newquestion"){
+				  Restangular.one("surveys/"+$routeParams.surveyid+"/questions/"+$routeParams.questionid+"").get().then(function (data) {
+$scope.questiondetails=data.resp
+$scope.question[$filter("filter")($scope.question,{"bindname":data.resp.questionType})[0].id].active=true
+$scope.$broadcast('update');
+
+					  })
+				}
+			
+		}])
+		
+		
+		app.controller('BinaryCtrl', [
+		'$scope',
+		'ngTableParams',
+		'$routeParams',
+		'Restangular',
+		'tags',
+		'$location','$injector','$filter',"$location","dataFactory",
+		function($scope, ngTableParams, $routeParams, Restangular,dataFactory, tags,$location,$injector,$filter,$location) {
+			$scope.typeoption=""
+				$scope.edit=false
+$scope.binaryquestionoptions=[{"name":"Yes/No","bind":"yes/no"},{"name":"None","bind":"none"}]
+		
+			   $scope.$on('update', function(event, mass) {
+				   $scope.userinput={}
+				   $scope.userinput.one=$scope.questiondetails.option[0]
+					$scope.userinput.two=$scope.questiondetails.option[1]
+				   
+			   });
+			
+			
+			$scope.saveQuestion=function(){
+$scope.options=[]
+$scope.options=$scope.typeoption.bind=="none"?[$scope.userinput.one,$scope.userinput.two]:["yes","no"]
+$scope.sendoption={"query":$scope.questiondetails.name,
+		  "questionType":'binary',  
+		  "option":$scope.options
+		 }
+
+	$scope.updatefunction($routeParams.surveyid,$scope.sendoption,$scope.questionid)
+
+				
+			}
+			
+			
+						
+		}])
+				app.controller('SliderCtrl', [
+		'$scope',
+		'ngTableParams',
+		'$routeParams',
+		'Restangular',
+		'tags',
+		'$location','$injector','$filter','dataFactory',
+		function($scope, ngTableParams, $routeParams, Restangular,dataFactory, tags,$location,$injector,$filter) {
+
+				$scope.edit=true
+
+				  $scope.$on('update', function(event, mass) {
+					   $scope.userinput={}
+					   $scope.userinput.one=$scope.questiondetails.option[0]
+						$scope.userinput.two=$scope.questiondetails.option[1]
+					   
+				   });
+			
+			
+			$scope.saveQuestion=function(){
+
+				$scope.options=[]
+
+					$scope.options=[$scope.userinput.one,$scope.userinput.two]
+
+				$scope.updatefunction($routeParams.surveyid,{"query":$scope.questiondetails.name,
+					  "questionType":'scale',  
+					  "option":$scope.options
+					 },$scope.questionid)
+
+			}
+		}])
+		
+		
+		app.controller('MCQquestionCtrl', [
+		'$scope',
+		'ngTableParams',
+		'$routeParams',
+		'Restangular',
+		'tags',
+		'$location','$injector','$filter','dataFactory',
+		function($scope, ngTableParams, $routeParams, Restangular,dataFactory, tags,$location,$injector,$filter) {
+
+				$scope.edit=true
+$scope.mcqquestion=""
+			
+	  $scope.$on('update', function(event, mass) {
+		
+		   $scope.options=$scope.questiondetails.option
+	
+		   
+	   });
+			
+			$scope.saveQuestion=function(){
+
+
+				$scope.updatefunction($routeParams.surveyid,{"query":$scope.questiondetails.name,
+					  "questionType":'multiplechoice',  
+					  "option":$scope.options
+					 },$scope.questionid)
+		
+			}
+		}])
+		
+			app.controller('CommentQuestionCtrl', [
+		'$scope',
+		'ngTableParams',
+		'$routeParams',
+		'Restangular',
+		'tags',
+		'$location','$injector','$filter','dataFactory',
+		function($scope, ngTableParams, $routeParams,dataFactory, Restangular, tags,$location,$injector,$filter) {
+
+				$scope.edit=true
+$scope.mcqquestion=""
+			
+	  $scope.$on('update', function(event, mass) {
+		
+		   $scope.userinput=$scope.questiondetails.option[0]
+	
+		   
+	   });
+			
+			$scope.saveQuestion=function(){
+				
+				$scope.updatefunction($routeParams.surveyid,{"query":$scope.questiondetails.name,
+					  "questionType":'text',  
+					  "option":[$scope.userinput],
+					 },$scope.questionid)
+			}
+			
+
+		}])

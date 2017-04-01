@@ -1,0 +1,135 @@
+package com.themopi.apis.searchactivity
+
+import grails.transaction.Transactional
+
+import com.themopi.account.Role
+import com.themopi.account.User
+import com.themopi.account.UserRole
+import com.themopi.exceptions.AccountException
+
+@Transactional
+class SearchService {
+
+	def grailsApplication
+
+	/**
+	 * find role based on id
+	 * then find user list based on query text and status
+	 * then return users matching with the role from user list
+	 * @param roleId
+	 * @param text
+	 * @param isActive
+	 * @param offset
+	 * @param limit
+	 * @return
+	 */
+	def getUsers(roleId, text, isActive, offset, limit){
+		offset = (offset == null )?0:offset
+		limit  = (limit == null)?10:limit
+		Boolean flag = new Boolean(isActive)
+		def countValue = 0
+		def results = []
+		//apply pagination here
+		if(isActive == "" && text == "" && roleId == ""){
+			   results = User.createCriteria().list(max:limit, offset:offset) {
+			   }
+			countValue = User.count()
+		}else if(isActive != "" && text == "" && roleId == ""){
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				eq("isActive", flag)
+			}
+			countValue = User.countByIsActive(flag)
+		}else if(isActive != "" && text == "" && roleId != ""){
+		
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				eq("isActive", flag)
+				eq("roleId",roleId.toLong())
+			}
+			countValue = User.countByIsActiveAndRoleId(flag,roleId.toLong())
+		}else if(isActive == "" && text != "" && roleId == "" ){
+		println "roleId == "+roleId
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+
+			}
+			def countList = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+
+			}
+			countValue = countList.size()
+		}else if(isActive == "" && text != "" && roleId != "" ){
+		println "roleId == "+roleId
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("roleId",roleId.toLong())
+			}
+			def countList = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("roleId",roleId.toLong())
+			}
+			countValue = countList.size()
+		}else if(isActive != "" && text != "" && roleId == "" ){
+		println "roleId == "+roleId
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("isActive", flag)
+				
+			}
+			def countList = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("isActive", flag)
+				
+			}
+			countValue = countList.size()
+		}else if(isActive == "" && text == "" && roleId != "" ){
+		    
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				eq("roleId",roleId.toLong())
+			}
+			def countList = User.createCriteria().list(max:limit, offset:offset) {
+				eq("roleId",roleId.toLong())
+			}
+			countValue = countList.size()
+		}else{
+		println "roleId == "+roleId
+			results = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("roleId",roleId.toLong())
+				eq("isActive", flag)
+			}
+			def countList = User.createCriteria().list(max:limit, offset:offset) {
+				or {
+					ilike("name", "%"+text+"%")
+					ilike("email", "%"+text+"%")
+				}
+				eq("roleId",roleId.toLong())
+				eq("isActive", flag)
+			}
+			countValue = countList.size()
+		}
+
+		return [users:results,count:countValue]
+	}
+
+}

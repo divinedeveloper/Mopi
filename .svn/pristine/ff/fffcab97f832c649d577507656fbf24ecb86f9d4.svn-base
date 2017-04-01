@@ -1,0 +1,114 @@
+app.controller(
+					'GiftCtrl',
+					[
+							'$scope',
+							'$filter',
+							'ngTableParams','$modal','Restangular','configsetting','$routeParams','$location','toaster','$upload','$timeout',
+							function($scope, $filter, ngTableParams,$modal,Restangular,configsetting,$routeParams,$location,toaster,$upload,$timeout) {
+							$scope.giftid=$routeParams.giftid
+								if($routeParams.giftid=="newgift"){
+									 $scope.edit=true								
+								}else{
+									 $scope.edit=false
+								}
+								
+								$scope.imageuploadfun=function(surveyid,id,type){
+								//	if($scope.imageupload){
+									$scope.upload = $upload.upload({
+								        url: 'api/v1/surveys/'+surveyid+'/gift/'+id+'/uploadImage',
+								        file: $scope.imageupload, 
+								        fileFormDataName: 'myfile',
+								      }).progress(function(evt) {
+								        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+								      }).success(function(data, status, headers, config) {
+								        // file is uploaded successfully
+								    	  if(!data.error && type=="new"){
+													 $location.path("gift/"+$routeParams.surveyid+"/"+id);
+													 toaster.pop('success', "Gift added succesfully");
+												
+								    	  }
+								        console.log(data);
+								      })
+									//}
+									
+								}
+									
+								
+							$scope.questionno=[0,1,2,3,4,5,6,7,8,9]
+								$scope.urlpath={}
+								$scope.urlpath.gift=$scope.environment=="Development"?"surveys/"+$routeParams.surveyid:$scope.staticjsonpath+"/gift.json";
+								 Restangular.one($scope.urlpath.gift).get().then(function (data) {
+						
+									  $scope.gift=data.resp.gift
+									 
+					
+								  })
+								  
+								  $scope.saveGift=function(){
+									 if($routeParams.giftid=="newgift"){
+									 Restangular.all("surveys/"+$routeParams.surveyid+"/gift").post($scope.gift).then(function (data) {
+										 console.log(data.resp.id)
+										 if($scope.imageupload){
+										 $scope.imageuploadfun($routeParams.surveyid,data.resp.id,'new')	
+										 }else{
+										 $location.path("gift/"+$routeParams.surveyid+"/"+data.resp.id);
+										 toaster.pop('success', "Gift added succesfully");
+										 }
+											
+											},function(data){
+												toaster.pop('error', data.message);
+											})
+									 }else{
+											Restangular.all("surveys/"+$routeParams.surveyid+"/gift/"+$routeParams.giftid).customPUT($scope.gift).then(
+													function(data) {
+														$scope.edit=false
+														$scope.imageuploadfun($routeParams.surveyid,$routeParams.giftid,'edit')	
+														
+														toaster.pop('success', "Gift updated succesfully");
+													},function(data){
+														toaster.pop('error', data.message);
+													}); 
+										 
+									 }
+									 
+								 }
+							
+								 $scope.deleteGift=function(){
+										Restangular.one("surveys/"+$routeParams.surveyid+"/gift/"+$routeParams.giftid).customDELETE().then(function(){
+										
+											toaster.pop('success',"Deleted Successfull");
+										},function(data){
+											toaster.pop('error', data.message);
+										});
+									 
+								 }
+								 
+								  $scope.onFileSelect = function($files) {
+									    //$files: an array of files selected, each file has name, size, and type.
+									    for (var i = 0; i < $files.length; i++) {
+									      var file = $files[i];
+									      $scope.imageupload=file
+							                var reader = new FileReader();
+							                reader.onload = function (e) {
+							                    $('#giftimage').attr('src', e.target.result);
+							                }
+							                reader.readAsDataURL(file);
+									 /*     $scope.upload = $upload.upload({
+									        url: 'api/v1/gift/2/uploadImage',
+									        data: {myObj: $scope.myModelObj},
+									        file: file, 
+									        fileFormDataName: 'myfile',
+									      }).progress(function(evt) {
+									        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+									      }).success(function(data, status, headers, config) {
+									        // file is uploaded successfully
+									        console.log(data);
+									      });*/
+								
+									    }
+									  
+									  };
+								 
+								 
+							}])
+							

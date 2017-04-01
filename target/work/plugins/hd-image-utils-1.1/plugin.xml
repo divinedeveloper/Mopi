@@ -1,0 +1,11 @@
+<plugin name='hd-image-utils' version='1.1' grailsVersion='2.0 &gt; *'>
+  <author>Craig Raw</author>
+  <authorEmail>craig@quirk.biz</authorEmail>
+  <title>Hd Image Utils Plugin</title>
+  <description>High quality image manipulation plugin, for scaling and cropping images. Uses the pure Java [java-image-scaling library|http://code.google.com/p/java-image-scaling/]</description>
+  <documentation>https://github.com/quirklabs/grails-hd-image-utils/blob/master/README.md</documentation>
+  <type>HdImageUtilsGrailsPlugin</type>
+  <resources>
+    <resource>com.quirklabs.hdimageutils.HdImageService</resource>
+  </resources>
+</plugin>

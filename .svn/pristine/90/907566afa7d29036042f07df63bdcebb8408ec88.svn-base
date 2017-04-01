@@ -1,0 +1,53 @@
+package com.themopi.apis.security
+
+
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.servlet.mvc.Controller;
+
+import spock.lang.*
+import grails.test.mixin.TestMixin;
+import grails.test.spock.IntegrationSpec
+
+/**
+ *
+ */
+class LogoutControllerIntegrationSpec extends IntegrationSpec {
+
+	def logoutService
+	
+    def setup() {
+		println "logout setup"
+//		mockDomain(AuthenticationToken)
+    }
+
+    def cleanup() {
+		println "logout clean up"
+    }
+
+    void "test logout"(){
+		given: "setting request params"
+		/*HttpServletRequest request 
+		request.setAttribute("contentType", "application/json")
+		request.setAttribute("X-Auth-Token", "4tidn0vsooi8fkinmemacu6f23u9ud69")*/
+		def logoutController = new LogoutController()
+//		logoutController.response.format("contentType","json")
+		logoutController.request.addHeader("contentType","application/json")
+		logoutController.request.addHeader("X-Auth-Token", "4tidn0vsooi8fkinmemacu6f23u9ud69")
+//		logoutController.request = [ setHeader: {'X-Auth-Token' -> '4tidn0vsooi8fkinmemacu6f23u9ud69' } ]
+		logoutController.logoutService = logoutService
+		
+		
+		when: "logout action is invoked"
+		//		AuthenticationToken.metaClass.static.findByAuthToken()
+		logoutController.logout()
+		
+		then:
+		println "here it is"
+		def result = logoutController.response.json
+		println result
+		
+		
+	}
+}

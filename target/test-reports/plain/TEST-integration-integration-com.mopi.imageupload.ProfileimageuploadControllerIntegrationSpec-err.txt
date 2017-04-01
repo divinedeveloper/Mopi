@@ -1,0 +1,1 @@
+--Output from test should upload profile image for a user and give image url in success response--

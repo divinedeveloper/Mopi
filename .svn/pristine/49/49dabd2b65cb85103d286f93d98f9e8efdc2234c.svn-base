@@ -1,0 +1,122 @@
+package com.themopi.survey
+
+import java.text.Format
+import java.text.SimpleDateFormat
+import java.util.Map;
+
+import com.themopi.account.User
+
+class Survey {
+	
+	List<Question> questions = []
+	List<SurveyCountry> visiblityCountry = []
+	List<SurveyCity> visiblityCity  =[]
+	List<HashTag> hashTag = []
+	List<User> individuals = []
+	User lastUpdatedBy
+	String name 
+	String surveyCode
+	String imageUrl
+	SurveyType surveyType
+	Boolean isActive = true , visibility = true
+	Integer surveyFlaggedCount = 0
+	Integer commentFlaggedCount = 0
+	Integer commentCount = 0
+	User user
+	Date dateCreated, lastUpdated, startTime, endTime
+	Gift gift
+	Integer giftCount
+	Integer giftDistributed
+	
+	Integer respCount = 0
+	Status status
+	VisibleTo visibleTo
+	Boolean isEditable = true
+	enum VisibleTo{
+		Followers,EveryOne,Individual
+	}
+	enum Status{
+		Draft,Active,Inactive,flagged,Autohidden,hidden
+	}
+	
+	enum SurveyType{
+		sponsered,nonsponsered
+	}
+	static hasMany = [visiblityCountry:SurveyCountry,visiblityCity:SurveyCity,responses: Response,hashTag:HashTag,questions:Question,individuals:User]
+	
+	static belongsTo  = [user: User]
+	
+	
+	
+	
+	static embedded = ['questions', 'hashTagBy','visiblityCountry','visiblityCity','gift','individuals']
+	
+	
+	/*enum SurveyType{
+		
+	}*/
+
+	static mapping = {
+		version false
+	}
+	static constraints = {
+		name blank:false,nullable:false
+		surveyType blank: false, nullable: false
+		questions min: 1, max: 15
+		startTime nullable:true
+		endTime nullable:true
+		commentCount default:0
+		surveyFlaggedCount default:0
+		commentFlaggedCount default:0
+		imageUrl nullable:true
+		giftCount nullable:true,default:0
+		giftDistributed nullable:true,default:0
+		gift nullable:true
+		respCount nullable:true,default:0
+		isEditable nullable:true
+
+	}
+	
+	
+	def responseCount(){
+		Set users= this.responses?.user?.id?.toSet()
+		return users?.size()
+	}
+	
+}
+
+class SurveyCountry{
+	String name
+	//double latitude
+	//double longitude
+	Map location
+	String countryCode
+	static constraints = {
+		name nullable:false
+	}
+	
+	static mapping = {
+		version true
+		location geoIndex:'2d', indexAttributes:[min:-500, max:500]
+	}
+}
+
+class SurveyCity{
+	String country
+	String state
+	String name
+	Map location
+	//double latitude
+	//double longitude
+	String countryCode
+	
+	static constraints = {
+		name nullable:false
+	}
+	
+	static mapping = {
+		version true
+		location geoIndex:'2d', indexAttributes:[min:-500, max:500]
+	}
+}
+

@@ -1,0 +1,49 @@
+<div class="page page-surveydetails" ng-controller="QuestionCtrl">
+<section class="panel panel-default table-dynamic">
+
+		<div class="panel-heading">
+		
+		<strong><i class="ti-user"></i> Question</strong>
+		</div>
+			<div class="panel-body">
+			  <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Question:</label>
+                            <div class="col-sm-10">
+                         
+                                <input type="text" ng-model="questiondetails.name" class="form-control" id="inputEmail3" placeholder="Enter question here?">
+                            </div>
+                        </div>
+                        </form>
+			</div>
+			</section>
+			
+	<section class="panel panel-default table-dynamic">
+
+		<div class="panel-heading">
+
+			<div class="row">
+				<div class="col-md-2">
+					<strong><i class="ti-user"></i> Question Details</strong>
+				</div>
+			
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="col-md-12">
+              
+                    <div class="ui-tab-container ui-tab-horizontal">
+               
+                        <tabset justified="true" class="ui-tab">
+                            <tab select="options=[]" heading="{{data.name}}"  active="data.active" ng-repeat="data in question">
+    <div ng-include src="data.pageurl"></div>
+                            </tab>
+                       
+                        </tabset>
+                    </div>                     
+                </div>
+		</div>
+
+	</section>
+	
+</div>

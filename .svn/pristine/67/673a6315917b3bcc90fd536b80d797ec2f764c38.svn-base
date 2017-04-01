@@ -1,0 +1,41 @@
+package com.themopi.survey
+
+import com.themopi.account.User
+import java.util.Date;
+
+class Question {
+	
+	User lastUpdatedBy
+	
+	//type will be enum
+	String  query, imageUrlQ
+	QuestionType questionType
+	
+	List option = []
+	
+	boolean isActive
+	
+	Date dateCreated
+	Date lastUpdated, deletedAt
+
+	enum QuestionType{
+		multiplechoice,scale,text,binary
+	}
+	
+	static hasMany = [option:String]
+    static constraints = {
+		questionType blank: false, nullable: false
+		query blank: true, nullable: true
+		option blank: false, nullable: false
+		imageUrlQ nullable:true
+		deletedAt nullable:true
+		
+	}
+	
+	def questionResponseCount(){
+		def response = Response.countByAnswerForQuestion(this)
+		if(response  == null) return 0;
+		return response
+	}
+
+}
